@@ -18,15 +18,11 @@ public class RegistroServicio {
     }
 
     public boolean verificarCorreo(String correo) {
-        // Verifica si el correo ya está registrado
-        return usuariosRepositorio.findByCorreo(correo) != null;
+        return usuariosRepositorio.findByCorreo(correo).isPresent();
     }
+    
 
     public void registrarUsuario(Usuarios usuario) {
-        // Encriptar la contraseña antes de guardarla
-        String contrasenaEncriptada = passwordEncoder.encode(usuario.getContraseña());
-        usuario.setContraseña(contrasenaEncriptada);
-
         // Guardar el usuario
         usuariosRepositorio.save(usuario);
     }

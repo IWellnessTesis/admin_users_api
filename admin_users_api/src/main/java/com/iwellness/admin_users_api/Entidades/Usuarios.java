@@ -2,17 +2,16 @@ package com.iwellness.admin_users_api.Entidades;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
 
 import lombok.*;
 
 @Entity
-@Table(name = "Usuarios")
+@Table(name = "usuarios")
 @Data
 @NoArgsConstructor
-@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+@AllArgsConstructor
 public class Usuarios {
 
     @Id

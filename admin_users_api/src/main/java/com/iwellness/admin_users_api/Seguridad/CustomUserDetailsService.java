@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.webauthn.management.UserCredentialRepository;
 import org.springframework.stereotype.Service;
 
 import com.iwellness.admin_users_api.Entidades.Usuarios;
@@ -27,60 +28,36 @@ import java.util.Collections;
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private UsuariosRepositorio usuariosRepositorio;
+    private UsuariosRepositorio userRepository;
 
     @Autowired
-    private RolRepositorio rolRepositorio;
+    private JWTProveedor jwtGenerator;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    // Método para cargar un usuario por su nombre de usuario (en este caso, el correo)
     @Override
-    public UserDetails loadUserByUsername(String correo) throws UsernameNotFoundException {
-        Usuarios usuario = usuariosRepositorio.findByCorreo(correo)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con el correo: " + correo));
-
-        // Mapear el usuario de la base de datos a UserDetails de Spring Security
-        return new User(
-                usuario.getCorreo(),
-                usuario.getContraseña(),
-                mapRolesToAuthorities(Collections.singletonList(usuario.getRol()))
-        );
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Usuarios user = userRepository.findByCorreo(email).orElseThrow(
+                () -> new UsernameNotFoundException("User not found"));
+        return new User(user.getCorreo(), user.getContraseña(), mapRolesToAuthorities(List.of(user.getRol())));
     }
 
-    // Método para convertir roles de la base de datos a GrantedAuthority
     private Collection<GrantedAuthority> mapRolesToAuthorities(List<Rol> roles) {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getNombre()))
-                .collect(Collectors.toList());
+        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getNombre())).collect(Collectors.toList());
     }
 
-    // Método para convertir un Turista a un Usuario
-    public Usuarios turistaToUsuario(Turista turista) {
-        Usuarios usuario = new Usuarios();
-        usuario.setCorreo(turista.getUsuarios().getCorreo());
-        usuario.setContraseña(passwordEncoder.encode(turista.getUsuarios().getContraseña()));
+    public String getUserRoleFromToken(String token) {
+        if (jwtGenerator.validateToken(token)) {
+            // Extraer el nombre de usuario del token
+            String username = jwtGenerator.getUserFromJwt(token);
+            
+            // Cargar los detalles del usuario desde la base de datos
+            UserDetails userDetails = loadUserByUsername(username);
 
-        // Asignar el rol de TURISTA
-        Rol rolTurista = rolRepositorio.findByNombre("TURISTA")
-                .orElseThrow(() -> new RuntimeException("Rol TURISTA no encontrado"));
-        usuario.setRol(rolTurista);
-
-        return usuario;
-    }
-
-    // Método para convertir un Proveedor a un Usuario
-    public Usuarios proveedorToUsuario(Proveedor proveedor) {
-        Usuarios usuario = new Usuarios();
-        usuario.setCorreo(proveedor.getUsuarios().getCorreo());
-        usuario.setContraseña(passwordEncoder.encode(proveedor.getUsuarios().getContraseña()));
-
-        // Asignar el rol de PROVEEDOR
-        Rol rolProveedor = rolRepositorio.findByNombre("PROVEEDOR")
-                .orElseThrow(() -> new RuntimeException("Rol PROVEEDOR no encontrado"));
-        usuario.setRol(rolProveedor);
-
-        return usuario;
+            // Obtener el rol del usuario
+            return userDetails.getAuthorities().stream()
+                    .findFirst()
+                    .map(authority -> authority.getAuthority())
+                    .orElse("ROLE_USER"); // Retornar un valor predeterminado si no se encuentra ningún rol
+        }
+        throw new IllegalArgumentException("Invalid JWT token");
     }
 }

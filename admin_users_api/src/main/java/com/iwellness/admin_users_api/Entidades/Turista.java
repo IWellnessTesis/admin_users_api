@@ -34,6 +34,9 @@ public class Turista {
 
     @Column(nullable = false)
     private String pais;
+
+    @Column(nullable = true)
+    private String actividadesInteres;
     
     
 }

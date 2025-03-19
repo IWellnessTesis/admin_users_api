@@ -61,10 +61,10 @@ public class SeguridadConfig {
                     String result = Base64.getEncoder().encodeToString(hash);
                     
                     logger.info("=============== ENCODER DEBUG ===============");
-                    logger.info("Contraseña sin procesar: {}", rawPassword);
+                    logger.info("Contrasena sin procesar: {}", rawPassword);
                     logger.info("Hash generado: {}", result);
-                    logger.info("Clase que llamó a encode: {}", new Exception().getStackTrace()[1].getClassName());
-                    logger.info("Método que llamó a encode: {}", new Exception().getStackTrace()[1].getMethodName());
+                    logger.info("Clase que llamo a encode: {}", new Exception().getStackTrace()[1].getClassName());
+                    logger.info("Metodo que llamo a encode: {}", new Exception().getStackTrace()[1].getMethodName());
                     logger.info("===========================================");
                     
                     return result;
@@ -78,9 +78,9 @@ public class SeguridadConfig {
                 String generatedHash = encode(rawPassword);
                 
                 logger.info("=============== MATCHER DEBUG ===============");
-                logger.info("Contraseña sin procesar: {}", rawPassword);
-                logger.info("Hash generado para comparación: {}", generatedHash);
-                logger.info("Hash almacenado para comparación: {}", encodedPassword);
+                logger.info("Contrasena sin procesar: {}", rawPassword);
+                logger.info("Hash generado para comparacion: {}", generatedHash);
+                logger.info("Hash almacenado para comparacion: {}", encodedPassword);
                 logger.info("¿Coinciden?: {}", generatedHash.equals(encodedPassword));
                 logger.info("===========================================");
                 

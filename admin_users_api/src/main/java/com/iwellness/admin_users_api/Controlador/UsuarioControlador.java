@@ -1,11 +1,9 @@
 package com.iwellness.admin_users_api.Controlador;
 
 import com.iwellness.admin_users_api.DTO.UsuariosDTO;
-import com.iwellness.admin_users_api.Entidades.Rol;
-import com.iwellness.admin_users_api.Entidades.Usuarios;
-import com.iwellness.admin_users_api.Repositorios.RolRepositorio;
+import com.iwellness.admin_users_api.Entidades.*;
+import com.iwellness.admin_users_api.Repositorios.*;
 import com.iwellness.admin_users_api.Servicios.RegistroServicio;
-import com.iwellness.admin_users_api.Servicios.UsusariosServicio;
 import com.iwellness.admin_users_api.Seguridad.JWTProveedor;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +15,11 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Map;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +36,13 @@ public class UsuarioControlador {
     private RolRepositorio rolRepositorio;
 
     @Autowired
-    UsusariosServicio ususariosServicio;
+    private UsuariosRepositorio usuariosRepositorio;
+
+    @Autowired
+    private TuristaRepositorio turistaRepositorio;
+
+    @Autowired
+    private ProveedorRepositorio proveedorRepositorio;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -46,86 +51,101 @@ public class UsuarioControlador {
     private JWTProveedor jwtProveedor;
 
     @Autowired
-    private PasswordEncoder passwordEncoder; 
+    private PasswordEncoder passwordEncoder;
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@RequestBody UsuariosDTO user) {
         try {
-            logger.info("Intento de login para usuario: {}", user.getCorreo());
-            
-            // IMPORTANTE: Corrección del orden de los parámetros
-            // El primer parámetro debe ser el nombre de usuario (correo) y el segundo la contraseña
+            logger.info("Intento de inicio de sesión para el usuario: {}", user.getCorreo());
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(user.getCorreo(), user.getContraseña()));
-    
-            // Establecer la autenticación en el contexto de seguridad
             SecurityContextHolder.getContext().setAuthentication(authentication);
-    
-            // Generar el JWT Token
             String token = jwtProveedor.TokenGenerado(authentication);
-            
-            logger.info("Login exitoso para usuario: {}", user.getCorreo());
-            
-            // Devolver el JWT generado
+            logger.info("Inicio de sesión exitoso para el usuario: {}", user.getCorreo());
             return new ResponseEntity<>(token, HttpStatus.OK);
-        } catch (AuthenticationException e) {
-            // Registrar el error
-            logger.error("Fallo de autenticación para usuario: {}", user.getCorreo(), e);
-            
-            // Manejar fallo de autenticación
-            return new ResponseEntity<>("Autenticación fallida: credenciales inválidas", HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
-            // Registrar cualquier otro error
-            logger.error("Error durante el login", e);
-            
-            // Manejar otros errores
-            return new ResponseEntity<>("Error durante el login: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("Error de autenticación para el usuario: {}", user.getCorreo(), e);
+            return new ResponseEntity<>("Autenticación fallida", HttpStatus.UNAUTHORIZED);
         }
     }
 
-    @PostMapping(value = "/registro", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> registrarUsuario(@RequestBody Map<String, Object> datos) {
-        String nombre = (String) datos.get("nombre");
-        String correo = (String) datos.get("correo");
-        String contraseña = (String) datos.get("contraseña");
-        String foto = (String) datos.get("foto");
-        Long rolId = ((Number) datos.get("rolId")).longValue();
-
+    @PostMapping(value = "/registro/Turista", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> registrarTurista(@RequestBody Map<String, Object> datos) {
         try {
-            logger.info("Intentando registrar usuario con correo: {}", correo);
+            // Add some logging or debugging statements here
+            System.out.println("Registering turista with datos: " + datos);
+            return registrarUsuario(datos, "Turista");
+        } catch (Exception e) {
+            // Log the exception
+            System.out.println("Error registering turista: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error registering turista");
+        }
+    }
 
-            if (registroServicio.verificarCorreo(correo)) {
-                logger.warn("Intento de registro con correo ya existente: {}", correo);
+    @PostMapping(value = "/registro/Proveedor", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> registrarProveedor(@RequestBody Map<String, Object> datos) {
+        return registrarUsuario(datos, "Proveedor");
+    }
+
+    private ResponseEntity<String> registrarUsuario(Map<String, Object> datos, String tipo) {
+        try {
+            String correo = (String) datos.get("correo");
+            logger.info("Intento de registro de {} con correo: {}", tipo, correo);
+    
+            if (usuariosRepositorio.existsByCorreo(correo)) {
+                logger.warn("El correo {} ya está registrado", correo);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: El correo ya está registrado");
             }
-
-            logger.info("Buscando rol con ID: {}", rolId);
-            Rol rol = rolRepositorio.findById(rolId).orElse(null);
-
+    
+            String contrasenaEncriptada = passwordEncoder.encode((String) datos.get("contraseña"));
+    
+            // Obtener el rol según el tipo de usuario
+            Rol rol = rolRepositorio.findByNombre(tipo).orElse(null);
             if (rol == null) {
-                logger.error("Error: No se encontró el rol con ID: {}", rolId);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: El rol no existe");
+                logger.error("El rol '{}' no existe en la base de datos", tipo);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: No se encontró el rol adecuado");
             }
-
-            //  Encriptar la contraseña con SHA-256
-            String contrasenaEncriptada = passwordEncoder.encode(contraseña);
-
+    
             Usuarios nuevoUsuario = new Usuarios();
-            nuevoUsuario.setNombre(nombre);
+            nuevoUsuario.setNombre((String) datos.get("nombre"));
             nuevoUsuario.setCorreo(correo);
             nuevoUsuario.setContraseña(contrasenaEncriptada);
-            nuevoUsuario.setFoto(foto);
+            nuevoUsuario.setFoto(datos.get("foto") != null ? (String) datos.get("foto") : "default.jpg");
             nuevoUsuario.setRol(rol);
-
-            registroServicio.registrarUsuario(nuevoUsuario);
-
-            logger.info("Usuario registrado exitosamente: {}", correo);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Usuario registrado con éxito");
+            usuariosRepositorio.save(nuevoUsuario);
+            logger.info("Usuario {} registrado exitosamente", correo);
+    
+            if ("Turista".equals(tipo)) {
+                Turista turista = new Turista();
+                turista.setUsuarios(nuevoUsuario);
+                turista.setTelefono((Integer) datos.get("telefono"));
+                turista.setDireccion((String) datos.get("direccion"));
+                turista.setCiudad((String) datos.get("ciudad"));
+                turista.setPais((String) datos.get("pais"));
+                turista.setActividadesInteres((String) datos.get("actividadesInteres"));
+                turistaRepositorio.save(turista);
+                logger.info("Turista registrado con éxito: {}", correo);
+            } else if ("Proveedor".equals(tipo)) {
+                Proveedor proveedor = new Proveedor();
+                proveedor.setUsuarios(nuevoUsuario);
+                proveedor.setNombre_empresa((String) datos.get("nombreEmpresa"));
+                proveedor.setDireccion((String) datos.get("direccion"));
+                proveedor.setCargoContacto((String) datos.get("cargoContacto"));
+                proveedor.setTelefono((String) datos.get("telefono"));
+                proveedor.setIdentificacionFiscal((String) datos.get("identificacionFiscal"));
+                proveedor.setTelefonoEmpresa((String) datos.get("telefonoEmpresa"));
+                proveedor.setLicenciasPermisos((String) datos.get("licenciasPermisos"));
+                proveedor.setCertificadosCalidad((String) datos.get("certificadosCalidad"));
+                proveedorRepositorio.save(proveedor);
+                logger.info("Proveedor registrado con éxito: {}", correo);
+            }
+    
+            return ResponseEntity.status(HttpStatus.CREATED).body("Registro exitoso");
         } catch (Exception e) {
-            logger.error("Error durante el registro del usuario", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred during registration");
+            logger.error("Error en el registro de {} con correo: {}", tipo, datos.get("correo"), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error en el registro");
         }
     }
-
-
+    
+    
 }

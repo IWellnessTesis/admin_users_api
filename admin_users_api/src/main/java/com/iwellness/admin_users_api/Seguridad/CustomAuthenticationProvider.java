@@ -47,13 +47,13 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             // Generar el hash con nuestro método
             String generatedHash = generateHash(password);
             
-            logger.info("Contraseña proporcionada: {}", password);
+            logger.info("Contrasena proporcionada: {}", password);
             logger.info("Hash generado: {}", generatedHash);
             logger.info("Hash almacenado: {}", storedPasswordHash);
             
             // Comprobar si coinciden los hashes
             if (generatedHash.equals(storedPasswordHash)) {
-                logger.info("¡Autenticación exitosa para: {}", email);
+                logger.info("¡Autenticacion exitosa para: {}", email);
                 
                 // Cargar el UserDetails para obtener autoridades
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
@@ -71,11 +71,11 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
                         userDetails, null, userDetails.getAuthorities());
             }
             
-            logger.warn("Autenticación fallida para: {}", email);
-            throw new BadCredentialsException("Contraseña incorrecta");
+            logger.warn("Autenticacion fallida para: {}", email);
+            throw new BadCredentialsException("Contrasena incorrecta");
         } catch (Exception e) {
             logger.error("Error durante la autenticación: ", e);
-            throw new BadCredentialsException("Error de autenticación: " + e.getMessage());
+            throw new BadCredentialsException("Error de autenticacion: " + e.getMessage());
         }
     }
     

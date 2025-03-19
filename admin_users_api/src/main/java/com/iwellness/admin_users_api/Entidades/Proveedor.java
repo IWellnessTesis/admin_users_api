@@ -27,5 +27,21 @@ public class Proveedor {
 
     @Column(nullable = false)
     private String direccion;    
+
+    @Column(nullable = false)
+    private String cargoContacto;
+
+    @Column(nullable = false)
+    private String telefono;
+
+    @Column(nullable = false, unique = true)
+    private String identificacionFiscal;
+
+    @Column(nullable = false)
+    private String telefonoEmpresa;
+
+    private String licenciasPermisos;
     
+    private String certificadosCalidad;
+
 }

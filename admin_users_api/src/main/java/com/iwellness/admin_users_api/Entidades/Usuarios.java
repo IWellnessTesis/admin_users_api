@@ -1,8 +1,6 @@
 package com.iwellness.admin_users_api.Entidades;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
 
 import lombok.*;

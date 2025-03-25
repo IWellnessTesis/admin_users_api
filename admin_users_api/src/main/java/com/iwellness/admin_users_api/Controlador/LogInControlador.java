@@ -5,7 +5,6 @@ import com.iwellness.admin_users_api.Servicios.RegistroServicio;
 import com.iwellness.admin_users_api.Seguridad.JWTProveedor;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
@@ -33,9 +32,6 @@ public class LogInControlador {
 
     @Autowired
     private JWTProveedor jwtProveedor;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@RequestBody UsuariosDTO user) {

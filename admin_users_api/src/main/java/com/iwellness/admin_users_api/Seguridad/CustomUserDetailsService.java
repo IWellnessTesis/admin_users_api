@@ -11,18 +11,13 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.webauthn.management.UserCredentialRepository;
 import org.springframework.stereotype.Service;
 
 import com.iwellness.admin_users_api.Entidades.Usuarios;
-import com.iwellness.admin_users_api.Entidades.Proveedor;
 import com.iwellness.admin_users_api.Entidades.Rol;
-import com.iwellness.admin_users_api.Entidades.Turista;
-import com.iwellness.admin_users_api.Repositorios.RolRepositorio;
+
 import com.iwellness.admin_users_api.Repositorios.UsuariosRepositorio;
 
-import java.util.Collections;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {

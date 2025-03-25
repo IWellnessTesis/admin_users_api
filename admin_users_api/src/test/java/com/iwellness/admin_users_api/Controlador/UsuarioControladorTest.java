@@ -1,171 +1,122 @@
 package com.iwellness.admin_users_api.Controlador;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
-
-import com.iwellness.admin_users_api.DTO.UsuariosDTO;
-import com.iwellness.admin_users_api.Entidades.Proveedor;
-import com.iwellness.admin_users_api.Entidades.Rol;
-import com.iwellness.admin_users_api.Entidades.Turista;
 import com.iwellness.admin_users_api.Entidades.Usuarios;
-import com.iwellness.admin_users_api.Repositorios.RolRepositorio;
-import com.iwellness.admin_users_api.Repositorios.UsuariosRepositorio;
-import com.iwellness.admin_users_api.Repositorios.TuristaRepositorio;
-import com.iwellness.admin_users_api.Repositorios.ProveedorRepositorio;
-import com.iwellness.admin_users_api.Seguridad.JWTProveedor;
+import com.iwellness.admin_users_api.Servicios.UsuariosServicio;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class UsuarioControladorTest {
+class UsuarioControladorTest {
+
+    @Mock
+    private UsuariosServicio usuariosServicio;
 
     @InjectMocks
-    private UsuarioControlador usuarioController;
-
-    @Mock
-    private UsuariosRepositorio usuariosRepositorio;
-
-    @Mock
-    private RolRepositorio rolRepositorio;
-
-    @Mock
-    private TuristaRepositorio turistaRepositorio;
-
-    @Mock
-    private ProveedorRepositorio proveedorRepositorio;
-
-    @Mock
-    private AuthenticationManager authenticationManager;
-
-    @Mock
-    private JWTProveedor jwtProveedor;
-
-    @Mock
-    private PasswordEncoder passwordEncoder;
+    private UsuarioControlador usuarioControlador;
 
     @Test
-    void testLogin_Success() {
-       UsuariosDTO userDTO = new UsuariosDTO();
-       userDTO.setCorreo("test@example.com");
-       userDTO.setContraseña("password");
-        Authentication authentication = mock(Authentication.class);
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
-        when(jwtProveedor.TokenGenerado(authentication)).thenReturn("mockedToken");
-        ResponseEntity<?> response = usuarioController.login(userDTO);
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("mockedToken", response.getBody());
+    void obtenerUsuarios_DeberiaRetornarListaUsuarios() {
+        // Crear una lista de mapas como devuelve el nuevo método findAllWithDetails
+        List<Map<String, Object>> usuarios = new ArrayList<>();
+        Map<String, Object> usuario = new HashMap<>();
+        usuario.put("id", 1L);
+        usuario.put("nombre", "Test User");
+        usuario.put("correo", "test@example.com");
+        usuarios.add(usuario);
+        
+        when(usuariosServicio.findAllWithDetails()).thenReturn(usuarios);
+
+        ResponseEntity<?> response = usuarioControlador.obtenerTodosLosUsuarios();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(usuarios, response.getBody());
     }
 
     @Test
-    void testLogin_Failed() {
-        UsuariosDTO userDTO = new UsuariosDTO();
-        userDTO.setCorreo("test@example.com");
-        userDTO.setContraseña("wrongpassword");
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenThrow(new BadCredentialsException("Authentication failed"));
-        ResponseEntity<?> response = usuarioController.login(userDTO);
-        assertEquals(401, response.getStatusCodeValue());
-        assertEquals("Autenticación fallida", response.getBody());
+    void obtenerUsuarios_DeberiaRetornarError() {
+        when(usuariosServicio.findAllWithDetails()).thenThrow(new RuntimeException("Error en DB"));
+
+        ResponseEntity<?> response = usuarioControlador.obtenerTodosLosUsuarios();
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("Error al obtener los usuarios"));
     }
 
     @Test
-    void testRegistrarTurista_Success() {
-        // Setup test data
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("nombre", "Test User");
-        userData.put("correo", "test@example.com");
-        userData.put("contraseña", "password");
-        userData.put("foto", "test.jpg");
-        userData.put("telefono", 88887777);
-        userData.put("direccion", "Calle 123");
-        userData.put("ciudad", "San José");
-        userData.put("pais", "Costa Rica");
-        userData.put("actividadesInteres", "Senderismo");
+    void obtenerUsuarioPorId_UsuarioExistente() {
+        // Crear un mapa como devuelve el nuevo método findByIdWithDetails
+        Map<String, Object> usuario = new HashMap<>();
+        usuario.put("id", 1L);
+        usuario.put("nombre", "Test User");
+        usuario.put("correo", "test@example.com");
         
-        // Mock email check
-        when(usuariosRepositorio.existsByCorreo("test@example.com")).thenReturn(false);
-        
-        // Mock role lookup - note controller uses findByNombre, not findById
-        Rol turistaRol = new Rol();
-        turistaRol.setNombre("Turista");
-        when(rolRepositorio.findByNombre("Turista")).thenReturn(Optional.of(turistaRol));
-        
-        // Mock password encoding
-        when(passwordEncoder.encode(anyString())).thenReturn("hashedPassword");
-        
-        // Mock user creation
-        Usuarios nuevoUsuario = new Usuarios();
-        nuevoUsuario.setId(1L);
-        when(usuariosRepositorio.save(any(Usuarios.class))).thenReturn(nuevoUsuario);
-        
-        // Mock tourist creation
-        Turista nuevoTurista = new Turista();
-        when(turistaRepositorio.save(any(Turista.class))).thenReturn(nuevoTurista);
-        
-        // Call the controller method
-        ResponseEntity<String> response = usuarioController.registrarTurista(userData);
-        
-        // Verify results
-        assertEquals(201, response.getStatusCodeValue(), "Should return 201 Created status");
-        assertEquals("Registro exitoso", response.getBody(), "Response body should confirm success");
+        when(usuariosServicio.findByIdWithDetails(1L)).thenReturn(usuario);
+
+        ResponseEntity<?> response = usuarioControlador.obtenerUsuarioPorId(1L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(usuario, response.getBody());
     }
 
     @Test
-    void testRegistrarProveedor_Success() {
-        // Setup test data
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("nombre", "Empresa XYZ");
-        userData.put("correo", "empresa@example.com");
-        userData.put("contraseña", "password");
-        userData.put("foto", "test.jpg");
-        userData.put("nombreEmpresa", "EcoTours");  
-        userData.put("direccion", "Avenida Central");
-        userData.put("cargoContacto", "Gerente");
-        userData.put("telefono", "88887777");
-        userData.put("identificacionFiscal", "J-12345678");
-        userData.put("telefonoEmpresa", "22223333");
-        userData.put("licenciasPermisos", "Licencia.pdf");
-        userData.put("certificadosCalidad", "Certificado.pdf");
+    void obtenerUsuarioPorId_UsuarioNoEncontrado() {
+        when(usuariosServicio.findByIdWithDetails(1L)).thenReturn(null);
+    
+        ResponseEntity<?> response = usuarioControlador.obtenerUsuarioPorId(1L);
+    
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("No se encontró el usuario con ID: 1"));
+    }
+
+    @Test
+    void actualizarUsuario_DeberiaActualizarUsuario() {
+        Usuarios usuario = new Usuarios();
+        usuario.setId(1L);
+        usuario.setNombre("Test User");
         
-        // Mock email check
-        when(usuariosRepositorio.existsByCorreo("empresa@example.com")).thenReturn(false);
+        // Mock para el método findById
+        when(usuariosServicio.findById(1L)).thenReturn(usuario);
         
-        // Mock role lookup - use findByNombre instead of findById
-        Rol proveedorRol = new Rol();
-        proveedorRol.setNombre("Proveedor");
-        when(rolRepositorio.findByNombre("Proveedor")).thenReturn(Optional.of(proveedorRol));
+        // Mock para el método update
+        when(usuariosServicio.update(usuario)).thenReturn(usuario);
         
-        // Mock password encoding
-        when(passwordEncoder.encode(anyString())).thenReturn("hashedPassword");
+        // Mock para el método findByIdWithDetails que se llama después de actualizar
+        Map<String, Object> usuarioActualizado = new HashMap<>();
+        usuarioActualizado.put("id", 1L);
+        usuarioActualizado.put("nombre", "Test User");
+        when(usuariosServicio.findByIdWithDetails(1L)).thenReturn(usuarioActualizado);
+
+        ResponseEntity<?> response = usuarioControlador.actualizarUsuario(1L, usuario);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(usuarioActualizado, response.getBody());
+    }
+
+    @Test
+    void eliminarUsuario_DeberiaEliminarUsuario() {
+        // Mock para el método findById
+        Usuarios usuario = new Usuarios();
+        usuario.setId(1L);
+        when(usuariosServicio.findById(1L)).thenReturn(usuario);
         
-        // Mock user creation
-        Usuarios nuevoUsuario = new Usuarios();
-        nuevoUsuario.setId(1L);
-        when(usuariosRepositorio.save(any(Usuarios.class))).thenReturn(nuevoUsuario);
-        
-        // Mock provider creation
-        Proveedor nuevoProveedor = new Proveedor();
-        when(proveedorRepositorio.save(any(Proveedor.class))).thenReturn(nuevoProveedor);
-        
-        // Call the controller method
-        ResponseEntity<String> response = usuarioController.registrarProveedor(userData);
-        
-        // Verify results
-        assertEquals(201, response.getStatusCodeValue(), "Should return 201 Created status");
-        assertEquals("Registro exitoso", response.getBody(), "Response body should confirm success");
+        doNothing().when(usuariosServicio).deleteById(1L);
+
+        ResponseEntity<?> response = usuarioControlador.eliminarUsuario(1L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Usuario eliminado con éxito", response.getBody());
     }
 }

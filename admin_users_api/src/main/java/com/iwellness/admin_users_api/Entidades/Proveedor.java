@@ -26,7 +26,10 @@ public class Proveedor {
     private String nombre_empresa;
 
     @Column(nullable = false)
-    private String direccion;    
+    private String coordenadaX;  
+    
+    @Column(nullable = false)
+    private String coordenadaY;   
 
     @Column(nullable = false)
     private String cargoContacto;

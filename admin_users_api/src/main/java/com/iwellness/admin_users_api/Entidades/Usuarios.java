@@ -34,12 +34,12 @@ public class Usuarios {
     @JoinColumn(name = "rol_id", nullable = false)
     private Rol rol;
 
-    @JsonIgnore
-    @OneToOne()
+    // Modificado: Eliminar @JsonIgnore y especificar el mapeo correcto
+    @OneToOne(mappedBy = "usuarios", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Turista turista;
 
-    @JsonIgnore
-    @OneToOne
+    // Modificado: Eliminar @JsonIgnore y especificar el mapeo correcto
+    @OneToOne(mappedBy = "usuarios", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Proveedor proveedor;
 
 }

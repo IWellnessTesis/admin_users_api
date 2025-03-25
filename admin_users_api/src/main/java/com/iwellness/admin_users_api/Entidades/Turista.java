@@ -23,7 +23,7 @@ public class Turista {
     @JoinColumn(name = "usuarios_id") // FK 
     private Usuarios usuarios;
 
-    @Column ( unique = true, nullable = false)
+    @Column (nullable = false)
     private int telefono;
 
     @Column(nullable = false)

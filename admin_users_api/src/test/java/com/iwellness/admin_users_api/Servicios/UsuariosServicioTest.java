@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.iwellness.admin_users_api.Entidades.Usuarios;
 import com.iwellness.admin_users_api.Repositorios.UsuariosRepositorio;
-import com.iwellness.admin_users_api.Servicios.UsusariosServicio;
+import com.iwellness.admin_users_api.Servicios.UsuariosServicio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,10 +20,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
-public class UsusariosServicioTest {
+public class UsuariosServicioTest {
 
     @InjectMocks
-    private UsusariosServicio ususariosServicio;
+    private UsuariosServicio ususariosServicio;
 
     @Mock
     private UsuariosRepositorio usuarioRepositorio;

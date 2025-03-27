@@ -25,7 +25,7 @@ public class Usuarios {
     @Column(nullable = false)
     private String contraseña;
 
-    @Column(nullable = false)
+    @Column
     private String foto;
 
     @ManyToOne(fetch = FetchType.EAGER)

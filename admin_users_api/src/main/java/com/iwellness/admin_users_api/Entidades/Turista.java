@@ -32,7 +32,7 @@ public class Turista {
     @Column(nullable = false)
     private String pais;
 
-    @Column(nullable = false)
+    @Column
     private String actividadesInteres;
     
     

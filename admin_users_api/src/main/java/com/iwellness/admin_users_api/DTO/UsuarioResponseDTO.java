@@ -60,7 +60,6 @@ public class UsuarioResponseDTO {
             
             turistaInfo.setId(turista.getId());
             turistaInfo.setTelefono(turista.getTelefono());
-            turistaInfo.setDireccion(turista.getDireccion());
             turistaInfo.setCiudad(turista.getCiudad());
             turistaInfo.setPais(turista.getPais());
             turistaInfo.setActividadesInteres(turista.getActividadesInteres());
@@ -79,10 +78,7 @@ public class UsuarioResponseDTO {
             proveedorInfo.setCoordenadaY(proveedor.getCoordenadaY());
             proveedorInfo.setCargoContacto(proveedor.getCargoContacto());
             proveedorInfo.setTelefono(proveedor.getTelefono());
-            proveedorInfo.setIdentificacionFiscal(proveedor.getIdentificacionFiscal());
             proveedorInfo.setTelefonoEmpresa(proveedor.getTelefonoEmpresa());
-            proveedorInfo.setLicenciasPermisos(proveedor.getLicenciasPermisos());
-            proveedorInfo.setCertificadosCalidad(proveedor.getCertificadosCalidad());
             
             dto.setProveedorInfo(proveedorInfo);
         }

@@ -95,7 +95,6 @@ public class RegistroServicio {
             }
         }
         
-        turista.setDireccion((String) datos.getOrDefault("direccion", ""));
         turista.setCiudad((String) datos.getOrDefault("ciudad", ""));
         turista.setPais((String) datos.getOrDefault("pais", ""));
         turista.setActividadesInteres((String) datos.getOrDefault("actividadesInteres", ""));
@@ -114,11 +113,7 @@ public class RegistroServicio {
         proveedor.setCoordenadaY((String) datos.getOrDefault("coordenadaY", "0"));
         proveedor.setCargoContacto((String) datos.getOrDefault("cargoContacto", ""));
         proveedor.setTelefono((String) datos.getOrDefault("telefono", ""));
-        proveedor.setIdentificacionFiscal((String) datos.getOrDefault("identificacionFiscal", 
-                                                                    "ID-" + usuario.getId()));
         proveedor.setTelefonoEmpresa((String) datos.getOrDefault("telefonoEmpresa", ""));
-        proveedor.setLicenciasPermisos((String) datos.getOrDefault("licenciasPermisos", ""));
-        proveedor.setCertificadosCalidad((String) datos.getOrDefault("certificadosCalidad", ""));
         
         // Guardar el proveedor
         proveedorRepositorio.save(proveedor);

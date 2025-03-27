@@ -31,20 +31,13 @@ public class Proveedor {
     @Column(nullable = false)
     private String coordenadaY;   
 
-    @Column(nullable = false)
+    @Column
     private String cargoContacto;
 
     @Column(nullable = false)
     private String telefono;
 
-    @Column(nullable = false, unique = true)
-    private String identificacionFiscal;
-
     @Column(nullable = false)
     private String telefonoEmpresa;
-
-    private String licenciasPermisos;
-    
-    private String certificadosCalidad;
 
 }

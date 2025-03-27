@@ -83,14 +83,4 @@ public class UsuarioControlador {
         }
     }
     
-    @GetMapping("/corregir-relaciones")
-    public ResponseEntity<?> corregirRelaciones() {
-        try {
-            usuariosServicio.corregirRelacionesExistentes();
-            return ResponseEntity.ok("Se han corregido las relaciones de los usuarios");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                   .body("Error al corregir las relaciones: " + e.getMessage());
-        }
-    }
 }

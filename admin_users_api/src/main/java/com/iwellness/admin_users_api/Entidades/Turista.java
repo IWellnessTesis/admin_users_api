@@ -27,15 +27,12 @@ public class Turista {
     private int telefono;
 
     @Column(nullable = false)
-    private String direccion;
-
-    @Column(nullable = false)
     private String ciudad;
 
     @Column(nullable = false)
     private String pais;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String actividadesInteres;
     
     

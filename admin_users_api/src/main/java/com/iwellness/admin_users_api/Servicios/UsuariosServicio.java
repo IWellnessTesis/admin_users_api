@@ -113,7 +113,6 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
                         Map<String, Object> turistaMap = new HashMap<>();
                         turistaMap.put("id", turista.getId());
                         turistaMap.put("telefono", turista.getTelefono());
-                        turistaMap.put("direccion", turista.getDireccion());
                         turistaMap.put("ciudad", turista.getCiudad());
                         turistaMap.put("pais", turista.getPais());
                         turistaMap.put("actividadesInteres", turista.getActividadesInteres());
@@ -132,10 +131,7 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
                         proveedorMap.put("coordenadaY", proveedor.getCoordenadaY());
                         proveedorMap.put("cargoContacto", proveedor.getCargoContacto());
                         proveedorMap.put("telefono", proveedor.getTelefono());
-                        proveedorMap.put("identificacionFiscal", proveedor.getIdentificacionFiscal());
                         proveedorMap.put("telefonoEmpresa", proveedor.getTelefonoEmpresa());
-                        proveedorMap.put("licenciasPermisos", proveedor.getLicenciasPermisos());
-                        proveedorMap.put("certificadosCalidad", proveedor.getCertificadosCalidad());
                         usuarioMap.put("proveedorInfo", proveedorMap);
                     } else {
                         usuarioMap.put("proveedorInfo", null);
@@ -181,7 +177,6 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
                     Map<String, Object> turistaMap = new HashMap<>();
                     turistaMap.put("id", turista.getId());
                     turistaMap.put("telefono", turista.getTelefono());
-                    turistaMap.put("direccion", turista.getDireccion());
                     turistaMap.put("ciudad", turista.getCiudad());
                     turistaMap.put("pais", turista.getPais());
                     turistaMap.put("actividadesInteres", turista.getActividadesInteres());
@@ -199,10 +194,7 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
                     proveedorMap.put("coordenadaY", proveedor.getCoordenadaY());
                     proveedorMap.put("cargoContacto", proveedor.getCargoContacto());
                     proveedorMap.put("telefono", proveedor.getTelefono());
-                    proveedorMap.put("identificacionFiscal", proveedor.getIdentificacionFiscal());
                     proveedorMap.put("telefonoEmpresa", proveedor.getTelefonoEmpresa());
-                    proveedorMap.put("licenciasPermisos", proveedor.getLicenciasPermisos());
-                    proveedorMap.put("certificadosCalidad", proveedor.getCertificadosCalidad());
                     usuarioMap.put("proveedorInfo", proveedorMap);
                 } else {
                     usuarioMap.put("proveedorInfo", null);
@@ -218,54 +210,5 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
         return usuarioMap;
     }
     
-    // Método para corregir relaciones existentes
-    @Transactional
-    public void corregirRelacionesExistentes() {
-        List<Usuarios> usuarios = usuarioRepositorio.findAll();
-        
-        for (Usuarios usuario : usuarios) {
-            if (usuario.getRol() == null) {
-                continue;
-            }
-            
-            String rolNombre = usuario.getRol().getNombre();
-            Long usuarioId = usuario.getId();
-            
-            if ("Turista".equals(rolNombre)) {
-                // Verificar si existe un registro de turista
-                Turista turista = turistaRepositorio.findByUsuariosId(usuarioId);
-                if (turista == null) {
-                    // Crear un nuevo registro de turista
-                    Turista nuevoTurista = new Turista();
-                    nuevoTurista.setUsuarios(usuario);
-                    nuevoTurista.setTelefono(88887777); // Valor por defecto
-                    nuevoTurista.setDireccion("Dirección por defecto");
-                    nuevoTurista.setCiudad("Ciudad por defecto");
-                    nuevoTurista.setPais("País por defecto");
-                    nuevoTurista.setActividadesInteres("Actividades por defecto");
-                    
-                    turistaRepositorio.save(nuevoTurista);
-                }
-            } else if ("Proveedor".equals(rolNombre)) {
-                // Verificar si existe un registro de proveedor
-                Proveedor proveedor = proveedorRepositorio.findByUsuariosId(usuarioId);
-                if (proveedor == null) {
-                    // Crear un nuevo registro de proveedor
-                    Proveedor nuevoProveedor = new Proveedor();
-                    nuevoProveedor.setUsuarios(usuario);
-                    nuevoProveedor.setNombre_empresa("Empresa por defecto");
-                    nuevoProveedor.setCoordenadaX("0");
-                    nuevoProveedor.setCoordenadaY("0");
-                    nuevoProveedor.setCargoContacto("Cargo por defecto");
-                    nuevoProveedor.setTelefono("88887777");
-                    nuevoProveedor.setIdentificacionFiscal("ID-" + usuarioId);
-                    nuevoProveedor.setTelefonoEmpresa("22221111");
-                    nuevoProveedor.setLicenciasPermisos("Licencias por defecto");
-                    nuevoProveedor.setCertificadosCalidad("Certificados por defecto");
-                    
-                    proveedorRepositorio.save(nuevoProveedor);
-                }
-            }
-        }
-    }
+    
 }

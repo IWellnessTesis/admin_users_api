@@ -19,7 +19,7 @@ public class Proveedor {
 
     @OneToOne
     @JsonIgnore
-    @JoinColumn(name = "usuarios_id") // FK 
+    @JoinColumn(name = "usuarios_id", referencedColumnName = "id", nullable = false) // FK 
     private Usuarios usuarios;
 
     @Column(nullable = false)

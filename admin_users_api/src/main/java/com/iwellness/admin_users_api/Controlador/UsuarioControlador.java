@@ -1,5 +1,7 @@
 package com.iwellness.admin_users_api.Controlador;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,6 +52,16 @@ public class UsuarioControlador {
             if (existingUsuario == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                        .body("No se encontró el usuario con ID: " + id);
+            }
+            
+            // Verificar si el correo ya existe y pertenece a otro usuario
+            if (!existingUsuario.getCorreo().equals(usuario.getCorreo())) {
+                // Si el correo cambió, verificar que no exista en otro usuario
+                Optional<Usuarios> usuarioConMismoCorreo = usuariosServicio.findByCorre(usuario.getCorreo());
+                if (usuarioConMismoCorreo.isPresent() && !usuarioConMismoCorreo.get().getId().equals(id)) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                           .body("El correo electrónico ya está en uso por otro usuario");
+                }
             }
             
             // Asegura que el ID sea el correcto

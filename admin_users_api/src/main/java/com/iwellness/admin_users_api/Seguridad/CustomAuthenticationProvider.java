@@ -62,14 +62,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
                         userDetails, null, userDetails.getAuthorities());
             }
             
-            // Como alternativa, podemos intentar con contraseñas predefinidas
-            if ("123456".equals(password) && "AY1npSo+qR+7qegplNwxhn66mbStJK2OyI/gWHR3GKI=".equals(storedPasswordHash)) {
-                logger.info("¡Coincidencia directa encontrada para contraseña conocida!");
-                
-                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-                return new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-            }
+
             
             logger.warn("Autenticacion fallida para: {}", email);
             throw new BadCredentialsException("Contrasena incorrecta");

@@ -1,6 +1,8 @@
 package com.iwellness.admin_users_api.Entidades;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
 
 import lombok.*;
@@ -14,6 +16,7 @@ public class Usuarios {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_usuarios")
     private Long id;
 
     @Column
@@ -32,12 +35,13 @@ public class Usuarios {
     @JoinColumn(name = "rol_id", nullable = false)
     private Rol rol;
 
-    // Modificado: Eliminar @JsonIgnore y especificar el mapeo correcto
     @OneToOne(mappedBy = "usuarios", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
     private Turista turista;
 
-    // Modificado: Eliminar @JsonIgnore y especificar el mapeo correcto
     @OneToOne(mappedBy = "usuarios", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
     private Proveedor proveedor;
+
 
 }

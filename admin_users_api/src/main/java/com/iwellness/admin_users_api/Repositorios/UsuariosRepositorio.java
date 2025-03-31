@@ -50,4 +50,9 @@ public interface  UsuariosRepositorio extends JpaRepository<Usuarios, Long> {
         "JOIN u.rol r")
     List<Object[]> findAllWithRoleInfo();
 
+    @Query("SELECT u FROM Usuarios u WHERE u.rol.id = 1")
+    List<Usuarios> getAllTuristas();
+
+    @Query("SELECT u FROM Usuarios u WHERE u.rol.id = 2")
+    List<Usuarios> getAllProveedores();
 }

@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.iwellness.admin_users_api.Clientes.ServicioFeignClient;
 import com.iwellness.admin_users_api.Entidades.Proveedor;
 import com.iwellness.admin_users_api.Entidades.Turista;
 import com.iwellness.admin_users_api.Entidades.Usuarios;
@@ -29,6 +30,9 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
     
     @Autowired
     private ProveedorRepositorio proveedorRepositorio;
+
+    @Autowired
+    private ServicioFeignClient servicioFeignClient;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -68,7 +72,15 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
 
     @Override
     public void deleteById(Long id) {
+        // Verificar si el proveedor existe
+        Usuarios usuario = usuarioRepositorio.findById(id).orElse(null);
+
+        if(usuario.getRol().getId() == 2){
+        // Llamar al micro de Servicios para eliminar los servicios del proveedor
+        servicioFeignClient.eliminarServiciosPorProveedor(id);
         usuarioRepositorio.deleteById(id);
+        }
+
     }
 
     public boolean existsByNombre(String nombre) {
@@ -209,6 +221,13 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
         
         return usuarioMap;
     }
-    
-    
+
+    public List<Usuarios> obtenerProveedores() {
+        return usuarioRepositorio.getAllProveedores();
+    }
+
+    public List<Usuarios> obtenerTuristas() {
+        return usuarioRepositorio.getAllTuristas();
+    }
+
 }

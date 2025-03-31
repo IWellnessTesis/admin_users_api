@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.iwellness.admin_users_api.Clientes.PreferenciaFeignClient;
 import com.iwellness.admin_users_api.Clientes.ServicioFeignClient;
 import com.iwellness.admin_users_api.Entidades.Proveedor;
 import com.iwellness.admin_users_api.Entidades.Turista;
@@ -33,6 +34,9 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
 
     @Autowired
     private ServicioFeignClient servicioFeignClient;
+
+    @Autowired
+    private PreferenciaFeignClient preferenciaFeignClient;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -76,9 +80,13 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
         Usuarios usuario = usuarioRepositorio.findById(id).orElse(null);
 
         if(usuario.getRol().getId() == 2){
-        // Llamar al micro de Servicios para eliminar los servicios del proveedor
-        servicioFeignClient.eliminarServiciosPorProveedor(id);
-        usuarioRepositorio.deleteById(id);
+            // Llamar al micro de Servicios para eliminar los servicios del proveedor
+            servicioFeignClient.eliminarServiciosPorProveedor(id);
+            usuarioRepositorio.deleteById(id);
+        }else if(usuario.getRol().getId() == 1){
+            // Llamar al micro de Preferencias para eliminar las preferencias del turista
+            preferenciaFeignClient.eliminarPreferenciasPorTurista(id);
+            usuarioRepositorio.deleteById(id);
         }
 
     }

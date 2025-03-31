@@ -117,15 +117,5 @@ public class UsuarioControlador {
                    .body("Error al obtener los turistas: " + e.getMessage());
         }
     }
-
-    @DeleteMapping("/proveedor/{id}")
-    public ResponseEntity<?> eliminarProveedor(@PathVariable Long id) {
-        try {
-            usuariosServicio.deleteById(id);
-            return ResponseEntity.ok("Entidad eliminada correctamente");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontró la entidad con ID: " + id);
-        }
-    }
     
 }

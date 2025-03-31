@@ -1,5 +1,6 @@
 package com.iwellness.admin_users_api.Controlador;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +93,28 @@ public class UsuarioControlador {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                    .body("Error al eliminar el usuario: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/proveedores")
+    public ResponseEntity<?> obtenerProveedores() {
+        try {
+            // Usar el nuevo método que devuelve Map<String, Object>
+            return ResponseEntity.ok(usuariosServicio.obtenerProveedores());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body("Error al obtener los proveedores: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/turistas")
+    public ResponseEntity<?> obtenerTuristas() {
+        try {
+            // Usar el nuevo método que devuelve Map<String, Object>
+            return ResponseEntity.ok(usuariosServicio.obtenerTuristas());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body("Error al obtener los turistas: " + e.getMessage());
         }
     }
     

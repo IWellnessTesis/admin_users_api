@@ -209,6 +209,13 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
         
         return usuarioMap;
     }
-    
-    
+
+    public List<Usuarios> obtenerProveedores() {
+        return usuarioRepositorio.getAllProveedores();
+    }
+
+    public List<Usuarios> obtenerTuristas() {
+        return usuarioRepositorio.getAllTuristas();
+    }
+      
 }

@@ -1,16 +1,14 @@
 package com.iwellness.admin_users_api.Controlador;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import com.iwellness.admin_users_api.DTO.UsuariosDTO;
 import com.iwellness.admin_users_api.Entidades.Usuarios;
-import com.iwellness.admin_users_api.Seguridad.CustomUserDetailsService;
 import com.iwellness.admin_users_api.Servicios.UsuariosServicio;
 
 @RestController
@@ -31,7 +29,7 @@ public class UsuarioControlador {
                    .body("Error al obtener los usuarios: " + e.getMessage());
         }
     }
-    
+
     @GetMapping("/buscar/{id}")
     public ResponseEntity<?> obtenerUsuarioPorId(@PathVariable Long id) {
         try {
@@ -60,7 +58,7 @@ public class UsuarioControlador {
             // Verificar si el correo ya existe y pertenece a otro usuario
             if (!existingUsuario.getCorreo().equals(usuario.getCorreo())) {
                 // Si el correo cambió, verificar que no exista en otro usuario
-                Optional<Usuarios> usuarioConMismoCorreo = usuariosServicio.findByCorre(usuario.getCorreo());
+                Optional<Usuarios> usuarioConMismoCorreo = usuariosServicio.findByCorreo(usuario.getCorreo());
                 if (usuarioConMismoCorreo.isPresent() && !usuarioConMismoCorreo.get().getId().equals(id)) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                            .body("El correo electrónico ya está en uso por otro usuario");

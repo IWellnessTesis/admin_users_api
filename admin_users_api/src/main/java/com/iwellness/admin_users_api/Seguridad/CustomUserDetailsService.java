@@ -55,4 +55,14 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
         throw new IllegalArgumentException("Invalid JWT token");
     }
+
+    public String getUserFromToken(String token) {
+        if (jwtGenerator.validateToken(token)) {
+            // Extraer el nombre de usuario del token
+            String username = jwtGenerator.getUserFromJwt(token);
+            
+            return username;
+        }
+        throw new IllegalArgumentException("Invalid JWT token");
+    }
 }

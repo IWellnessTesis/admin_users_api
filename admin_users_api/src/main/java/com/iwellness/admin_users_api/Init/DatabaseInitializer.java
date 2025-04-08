@@ -30,7 +30,7 @@ public class DatabaseInitializer {
 
                 logger.info("Roles creados: Turista y Proveedor.");
             } else {
-                logger.info("La base de datos ya contiene roles, omitiendo inicialización.");
+                logger.info("La base de datos ya contiene roles, omitiendo inicializacion.");
             }
         };
     }

@@ -2,6 +2,7 @@ package com.iwellness.admin_users_api.Controlador;
 
 import com.iwellness.admin_users_api.DTO.UsuariosDTO;
 import com.iwellness.admin_users_api.Servicios.RegistroServicio;
+import com.iwellness.admin_users_api.Seguridad.CustomUserDetailsService;
 import com.iwellness.admin_users_api.Seguridad.JWTProveedor;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,10 @@ public class LogInControlador {
     @Autowired
     private JWTProveedor jwtProveedor;
 
+    
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
+
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@RequestBody UsuariosDTO user) {
         try {
@@ -58,4 +63,27 @@ public class LogInControlador {
     public ResponseEntity<String> registrarProveedor(@RequestBody Map<String, Object> datos) {
         return ResponseEntity.status(HttpStatus.CREATED).body(registroServicio.registrarUsuario(datos, "Proveedor"));
     }
+
+    
+    // GET: Obtener el rol del usuario a partir del JWT
+    @GetMapping("/role")
+    public ResponseEntity<String> getRoleFromToken(@RequestHeader("Authorization") String token) {
+        try {
+            // Extraer el token JWT del encabezado Authorization
+            String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+
+            // Obtener el rol desde el token
+            String role = customUserDetailsService.getUserRoleFromToken(jwtToken);
+
+            // Devolver el rol
+            return ResponseEntity.ok(role);
+        } catch (IllegalArgumentException e) {
+            // Manejar token JWT inválido
+            return ResponseEntity.badRequest().body("Invalid JWT token");
+        } catch (Exception e) {
+            // Manejar otros errores
+            return ResponseEntity.status(500).body("Internal server error");
+        }
+    }
+
 }

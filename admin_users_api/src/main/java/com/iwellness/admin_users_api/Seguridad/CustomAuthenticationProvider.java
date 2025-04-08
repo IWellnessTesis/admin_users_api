@@ -34,7 +34,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String email = authentication.getName();
         String password = authentication.getCredentials().toString();
-        
+        logger.info("===============    AUTHENTICATOR DEBUG   ===============");
         logger.info("Intentando autenticar usuario: {}", email);
         
         try {
@@ -53,7 +53,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             
             // Comprobar si coinciden los hashes
             if (generatedHash.equals(storedPasswordHash)) {
-                logger.info("¡Autenticacion exitosa para: {}", email);
+                logger.info("Autenticacion exitosa para: {}", email);
                 
                 // Cargar el UserDetails para obtener autoridades
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);

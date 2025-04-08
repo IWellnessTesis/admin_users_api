@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.iwellness.admin_users_api.DTO.UsuariosDTO;
 import com.iwellness.admin_users_api.Entidades.Usuarios;
+import com.iwellness.admin_users_api.Seguridad.CustomUserDetailsService;
 import com.iwellness.admin_users_api.Servicios.UsuariosServicio;
 
 @RestController
@@ -117,5 +119,6 @@ public class UsuarioControlador {
                    .body("Error al obtener los turistas: " + e.getMessage());
         }
     }
+
     
 }

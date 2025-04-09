@@ -99,7 +99,7 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
         return usuarioRepositorio.existsByCorreo(correo);
     }
 
-    public Optional<Usuarios> findByCorre(String correo) {
+    public Optional<Usuarios> findByCorreo(String correo) {
         return usuarioRepositorio.findByCorreo(correo);
     }
 

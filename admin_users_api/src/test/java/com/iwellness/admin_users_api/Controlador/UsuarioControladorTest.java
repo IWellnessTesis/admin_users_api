@@ -1,5 +1,7 @@
 package com.iwellness.admin_users_api.Controlador;
 
+import com.iwellness.admin_users_api.DTO.EditarTuristaDTO;
+import com.iwellness.admin_users_api.Entidades.Turista;
 import com.iwellness.admin_users_api.Entidades.Usuarios;
 import com.iwellness.admin_users_api.Servicios.UsuariosServicio;
 import org.junit.jupiter.api.Test;
@@ -81,26 +83,47 @@ class UsuarioControladorTest {
         assertTrue(response.getBody().toString().contains("No se encontró el usuario con ID: 1"));
     }
 
-    @Test
-    void actualizarUsuario_DeberiaActualizarUsuario() {
-        Usuarios usuario = new Usuarios();
-        usuario.setId(1L);
-        usuario.setNombre("Test User");
-        
-        // Mock para el método findById
-        when(usuariosServicio.findById(1L)).thenReturn(usuario);
-        
-        // Mock para el método update
-        when(usuariosServicio.update(usuario)).thenReturn(usuario);
-        
-        // Mock para el método findByIdWithDetails que se llama después de actualizar
-        Map<String, Object> usuarioActualizado = new HashMap<>();
-        usuarioActualizado.put("id", 1L);
-        usuarioActualizado.put("nombre", "Test User");
-        when(usuariosServicio.findByIdWithDetails(1L)).thenReturn(usuarioActualizado);
+     @Test
+     void actualizarUsuario_DeberiaActualizarUsuario() {
+        // Arrange
+        // Creamos el DTO con los datos de actualización (nombre, teléfono, ciudad, país)
+        EditarTuristaDTO dto = new EditarTuristaDTO();
+        dto.setNombre("Test User");
+        dto.setTelefono(123456789);
+        dto.setCiudad("Test City");
+        dto.setPais("Test Country");
 
-        ResponseEntity<?> response = usuarioControlador.actualizarUsuario(1L, usuario);
+        // Creamos el usuario inicial y su relación con Turista
+        Usuarios usuarioInicial = new Usuarios();
+        usuarioInicial.setId(1L);
+        usuarioInicial.setNombre("Original Name");
+        Turista turistaInicial = new Turista();
+        turistaInicial.setId(1L);
+        turistaInicial.setTelefono(987654321);
+        turistaInicial.setCiudad("Old City");
+        turistaInicial.setPais("Old Country");
+        turistaInicial.setUsuarios(usuarioInicial);
+        usuarioInicial.setTurista(turistaInicial);
 
+        // Creamos el objeto Usuario tal como se espera después de actualizar
+        Usuarios usuarioActualizado = new Usuarios();
+        usuarioActualizado.setId(1L);
+        usuarioActualizado.setNombre(dto.getNombre());
+        Turista turistaActualizada = new Turista();
+        turistaActualizada.setId(1L);
+        turistaActualizada.setTelefono(dto.getTelefono());
+        turistaActualizada.setCiudad(dto.getCiudad());
+        turistaActualizada.setPais(dto.getPais());
+        turistaActualizada.setUsuarios(usuarioActualizado);
+        usuarioActualizado.setTurista(turistaActualizada);
+
+        // Simulamos la llamada al método actualizarUsuarioTurista del servicio
+        when(usuariosServicio.actualizarUsuarioTurista(1L, dto)).thenReturn(usuarioActualizado);
+
+        // Act
+        ResponseEntity<?> response = usuarioControlador.editarUsuarioTurista(1L, dto);
+
+        // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(usuarioActualizado, response.getBody());
     }

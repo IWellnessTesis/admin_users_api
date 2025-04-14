@@ -12,6 +12,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+@ToString(exclude = {"usuarios"})
 public class Turista {
 
     @Id

@@ -12,6 +12,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"turista", "proveedor"})
 public class Usuarios {
 
     @Id

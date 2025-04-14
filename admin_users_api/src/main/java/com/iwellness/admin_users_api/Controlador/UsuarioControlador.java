@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import com.iwellness.admin_users_api.DTO.EditarTuristaDTO;
 import com.iwellness.admin_users_api.Entidades.Usuarios;
 import com.iwellness.admin_users_api.Servicios.UsuariosServicio;
 
@@ -47,35 +48,12 @@ public class UsuarioControlador {
     }
     
     @PutMapping("/editar/{id}")
-    public ResponseEntity<?> actualizarUsuario(@PathVariable Long id, @RequestBody Usuarios usuario) {
+    public ResponseEntity<?> editarUsuarioTurista(@PathVariable Long id, @RequestBody EditarTuristaDTO dto) {
         try {
-            Usuarios existingUsuario = usuariosServicio.findById(id);
-            if (existingUsuario == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                       .body("No se encontró el usuario con ID: " + id);
-            }
-            
-            // Verificar si el correo ya existe y pertenece a otro usuario
-            if (!existingUsuario.getCorreo().equals(usuario.getCorreo())) {
-                // Si el correo cambió, verificar que no exista en otro usuario
-                Optional<Usuarios> usuarioConMismoCorreo = usuariosServicio.findByCorreo(usuario.getCorreo());
-                if (usuarioConMismoCorreo.isPresent() && !usuarioConMismoCorreo.get().getId().equals(id)) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                           .body("El correo electrónico ya está en uso por otro usuario");
-                }
-            }
-            
-            // Asegura que el ID sea el correcto
-            usuario.setId(id);
-            
-            // Actualiza el usuario
-            usuariosServicio.update(usuario);
-            
-            // Retorna los detalles actualizados
-            return ResponseEntity.ok(usuariosServicio.findByIdWithDetails(id));
+            Usuarios usuarioActualizado = usuariosServicio.actualizarUsuarioTurista(id, dto);
+            return ResponseEntity.ok(usuarioActualizado);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                   .body("Error al actualizar el usuario: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
     }
 

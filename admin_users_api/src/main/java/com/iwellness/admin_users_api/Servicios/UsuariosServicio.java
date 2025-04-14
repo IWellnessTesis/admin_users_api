@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.iwellness.admin_users_api.Clientes.PreferenciaFeignClient;
 import com.iwellness.admin_users_api.Clientes.ServicioFeignClient;
+import com.iwellness.admin_users_api.DTO.EditarTuristaDTO;
 import com.iwellness.admin_users_api.Entidades.Proveedor;
 import com.iwellness.admin_users_api.Entidades.Turista;
 import com.iwellness.admin_users_api.Entidades.Usuarios;
@@ -61,8 +62,31 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
         return password.matches("^[A-Za-z0-9+/=]+$") && password.length() >= 44;
     }
     
-    public Usuarios update(Usuarios usuario) {
-        return usuarioRepositorio.saveAndFlush(usuario);
+    public Usuarios actualizarUsuarioTurista(Long id, EditarTuristaDTO dto) {
+        Optional<Usuarios> opUsuario = usuarioRepositorio.findById(id);
+        if (!opUsuario.isPresent()) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+        Usuarios usuario = opUsuario.get();
+
+        // Actualiza el nombre del usuario
+        usuario.setNombre(dto.getNombre());
+
+        // Actualiza la información del turista
+        Turista turista = usuario.getTurista();
+        if (turista == null) {
+            throw new RuntimeException("Información del turista no encontrada");
+        }
+        turista.setTelefono(dto.getTelefono());
+        turista.setCiudad(dto.getCiudad());
+        turista.setPais(dto.getPais());
+
+        // Se persisten las actualizaciones
+        // Debido al cascade en la relación uno a uno, se puede guardar primero el turista
+        turistaRepositorio.save(turista);
+        usuarioRepositorio.save(usuario);
+
+        return usuario;
     }
     
     public List<Usuarios> findAll() {

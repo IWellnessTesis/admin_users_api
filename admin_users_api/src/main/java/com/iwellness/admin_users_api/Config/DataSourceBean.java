@@ -37,7 +37,7 @@ public class DataSourceBean {
         
         dataSource.setUrl(url);
         
-        logger.info("¿Es contexto de test? {}", isTestContext);
+        logger.info("Es contexto de test? {}", isTestContext);
         logger.info("URL de la base de datos: {}", url);
         logger.info("-------------------------------------");
         

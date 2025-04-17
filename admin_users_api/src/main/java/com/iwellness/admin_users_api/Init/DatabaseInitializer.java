@@ -25,12 +25,16 @@ public class DatabaseInitializer {
                 Rol proveedor = new Rol();
                 proveedor.setNombre("Proveedor");
 
+                Rol admin = new Rol();
+                admin.setNombre("Admin");
+
                 rolRepositorio.save(turista);
                 rolRepositorio.save(proveedor);
+                rolRepositorio.save(admin);
 
-                logger.info("Roles creados: Turista y Proveedor.");
+                logger.info("Roles creados: Admin, Turista y Proveedor.");
             } else {
-                logger.info("La base de datos ya contiene roles, omitiendo inicialización.");
+                logger.info("La base de datos ya contiene roles, omitiendo inicializacion.");
             }
         };
     }

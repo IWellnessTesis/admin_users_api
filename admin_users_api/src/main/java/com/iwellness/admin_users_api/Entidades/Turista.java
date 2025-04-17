@@ -1,5 +1,6 @@
 package com.iwellness.admin_users_api.Entidades;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -11,17 +12,20 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+@ToString(exclude = {"usuarios"})
 public class Turista {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_usuarios_turista")
     Long id;
 
 
     @OneToOne
-    @JsonIgnore
-    @JoinColumn(name = "usuarios_id") // FK 
+    @JoinColumn(name = "usuarios_id", referencedColumnName = "id_usuarios", nullable = false)
+    @JsonBackReference
     private Usuarios usuarios;
+
 
     @Column (nullable = false)
     private int telefono;

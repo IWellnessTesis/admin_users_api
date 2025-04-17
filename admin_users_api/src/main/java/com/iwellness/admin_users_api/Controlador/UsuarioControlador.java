@@ -1,10 +1,14 @@
 package com.iwellness.admin_users_api.Controlador;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import com.iwellness.admin_users_api.DTO.EditarTuristaDTO;
 import com.iwellness.admin_users_api.Entidades.Usuarios;
 import com.iwellness.admin_users_api.Servicios.UsuariosServicio;
 
@@ -26,7 +30,7 @@ public class UsuarioControlador {
                    .body("Error al obtener los usuarios: " + e.getMessage());
         }
     }
-    
+
     @GetMapping("/buscar/{id}")
     public ResponseEntity<?> obtenerUsuarioPorId(@PathVariable Long id) {
         try {
@@ -44,25 +48,12 @@ public class UsuarioControlador {
     }
     
     @PutMapping("/editar/{id}")
-    public ResponseEntity<?> actualizarUsuario(@PathVariable Long id, @RequestBody Usuarios usuario) {
+    public ResponseEntity<?> editarUsuarioTurista(@PathVariable Long id, @RequestBody EditarTuristaDTO dto) {
         try {
-            Usuarios existingUsuario = usuariosServicio.findById(id);
-            if (existingUsuario == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                       .body("No se encontró el usuario con ID: " + id);
-            }
-            
-            // Asegura que el ID sea el correcto
-            usuario.setId(id);
-            
-            // Actualiza el usuario
-            usuariosServicio.update(usuario);
-            
-            // Retorna los detalles actualizados
-            return ResponseEntity.ok(usuariosServicio.findByIdWithDetails(id));
+            Usuarios usuarioActualizado = usuariosServicio.actualizarUsuarioTurista(id, dto);
+            return ResponseEntity.ok(usuarioActualizado);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                   .body("Error al actualizar el usuario: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
     }
 
@@ -82,5 +73,28 @@ public class UsuarioControlador {
                    .body("Error al eliminar el usuario: " + e.getMessage());
         }
     }
+
+    @GetMapping("/proveedores")
+    public ResponseEntity<?> obtenerProveedores() {
+        try {
+            // Usar el nuevo método que devuelve Map<String, Object>
+            return ResponseEntity.ok(usuariosServicio.obtenerProveedores());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body("Error al obtener los proveedores: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/turistas")
+    public ResponseEntity<?> obtenerTuristas() {
+        try {
+            // Usar el nuevo método que devuelve Map<String, Object>
+            return ResponseEntity.ok(usuariosServicio.obtenerTuristas());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body("Error al obtener los turistas: " + e.getMessage());
+        }
+    }
+
     
 }

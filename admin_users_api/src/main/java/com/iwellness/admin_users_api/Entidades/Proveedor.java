@@ -1,5 +1,6 @@
 package com.iwellness.admin_users_api.Entidades;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -15,11 +16,14 @@ public class Proveedor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_usuarios_proveedor")
     Long id;
 
     @OneToOne
-    @JoinColumn(name = "usuarios_id") // FK 
+    @JoinColumn(name = "usuarios_id", referencedColumnName = "id_usuarios", nullable = false)
+    @JsonBackReference
     private Usuarios usuarios;
+
 
     @Column(nullable = false)
     private String nombre_empresa;

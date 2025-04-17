@@ -34,7 +34,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String email = authentication.getName();
         String password = authentication.getCredentials().toString();
-        
+        logger.info("===============    AUTHENTICATOR DEBUG   ===============");
         logger.info("Intentando autenticar usuario: {}", email);
         
         try {
@@ -53,7 +53,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             
             // Comprobar si coinciden los hashes
             if (generatedHash.equals(storedPasswordHash)) {
-                logger.info("¡Autenticacion exitosa para: {}", email);
+                logger.info("Autenticacion exitosa para: {}", email);
                 
                 // Cargar el UserDetails para obtener autoridades
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
@@ -62,14 +62,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
                         userDetails, null, userDetails.getAuthorities());
             }
             
-            // Como alternativa, podemos intentar con contraseñas predefinidas
-            if ("123456".equals(password) && "AY1npSo+qR+7qegplNwxhn66mbStJK2OyI/gWHR3GKI=".equals(storedPasswordHash)) {
-                logger.info("¡Coincidencia directa encontrada para contraseña conocida!");
-                
-                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-                return new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-            }
+
             
             logger.warn("Autenticacion fallida para: {}", email);
             throw new BadCredentialsException("Contrasena incorrecta");

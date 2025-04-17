@@ -11,6 +11,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.iwellness.admin_users_api.Clientes.PreferenciaFeignClient;
+import com.iwellness.admin_users_api.Clientes.ServicioFeignClient;
+import com.iwellness.admin_users_api.DTO.EditarTuristaDTO;
 import com.iwellness.admin_users_api.Entidades.Proveedor;
 import com.iwellness.admin_users_api.Entidades.Turista;
 import com.iwellness.admin_users_api.Entidades.Usuarios;
@@ -29,6 +32,12 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
     
     @Autowired
     private ProveedorRepositorio proveedorRepositorio;
+
+    @Autowired
+    private ServicioFeignClient servicioFeignClient;
+
+    @Autowired
+    private PreferenciaFeignClient preferenciaFeignClient;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -53,8 +62,31 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
         return password.matches("^[A-Za-z0-9+/=]+$") && password.length() >= 44;
     }
     
-    public Usuarios update(Usuarios usuario) {
-        return usuarioRepositorio.saveAndFlush(usuario);
+    public Usuarios actualizarUsuarioTurista(Long id, EditarTuristaDTO dto) {
+        Optional<Usuarios> opUsuario = usuarioRepositorio.findById(id);
+        if (!opUsuario.isPresent()) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+        Usuarios usuario = opUsuario.get();
+
+        // Actualiza el nombre del usuario
+        usuario.setNombre(dto.getNombre());
+
+        // Actualiza la información del turista
+        Turista turista = usuario.getTurista();
+        if (turista == null) {
+            throw new RuntimeException("Información del turista no encontrada");
+        }
+        turista.setTelefono(dto.getTelefono());
+        turista.setCiudad(dto.getCiudad());
+        turista.setPais(dto.getPais());
+
+        // Se persisten las actualizaciones
+        // Debido al cascade en la relación uno a uno, se puede guardar primero el turista
+        turistaRepositorio.save(turista);
+        usuarioRepositorio.save(usuario);
+
+        return usuario;
     }
     
     public List<Usuarios> findAll() {
@@ -68,7 +100,19 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
 
     @Override
     public void deleteById(Long id) {
-        usuarioRepositorio.deleteById(id);
+        // Verificar si el proveedor existe
+        Usuarios usuario = usuarioRepositorio.findById(id).orElse(null);
+
+        if(usuario.getRol().getId() == 2){
+            // Llamar al micro de Servicios para eliminar los servicios del proveedor
+            servicioFeignClient.eliminarServiciosPorProveedor(id);
+            usuarioRepositorio.deleteById(id);
+        }else if(usuario.getRol().getId() == 1){
+            // Llamar al micro de Preferencias para eliminar las preferencias del turista
+            preferenciaFeignClient.eliminarPreferenciasPorTurista(id);
+            usuarioRepositorio.deleteById(id);
+        }
+
     }
 
     public boolean existsByNombre(String nombre) {
@@ -79,7 +123,7 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
         return usuarioRepositorio.existsByCorreo(correo);
     }
 
-    public Optional<Usuarios> findByCorre(String correo) {
+    public Optional<Usuarios> findByCorreo(String correo) {
         return usuarioRepositorio.findByCorreo(correo);
     }
 
@@ -209,6 +253,13 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
         
         return usuarioMap;
     }
-    
-    
+
+    public List<Usuarios> obtenerProveedores() {
+        return usuarioRepositorio.getAllProveedores();
+    }
+
+    public List<Usuarios> obtenerTuristas() {
+        return usuarioRepositorio.getAllTuristas();
+    }
+
 }

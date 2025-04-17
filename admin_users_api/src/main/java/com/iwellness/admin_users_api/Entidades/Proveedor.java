@@ -18,7 +18,6 @@ public class Proveedor {
     Long id;
 
     @OneToOne
-    @JsonIgnore
     @JoinColumn(name = "usuarios_id") // FK 
     private Usuarios usuarios;
 

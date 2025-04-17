@@ -12,8 +12,30 @@ public class MensajeServiceUsers {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void enviarMensaje(String mensaje) {
-        rabbitTemplate.convertAndSend(MensajeServiceUsersConfig.EXCHANGE_NAME, MensajeServiceUsersConfig.ROUTING_KEY_USERS, mensaje);
-        System.out.println("Mensaje enviado: " + mensaje);
+    public void enviarMensajeUsuarios(String mensaje) {
+        try{
+            this.rabbitTemplate.convertAndSend(MensajeServiceUsersConfig.EXCHANGE_NAME, MensajeServiceUsersConfig.ROUTING_KEY_USERS, mensaje);
+            System.out.println("Mensaje enviado: " + mensaje);
+        } catch (Exception e) {
+            System.err.println("Error al enviar el mensaje: " + e.getMessage());
+        }
+    }
+
+    public void enviarMensajeProveedor(String mensaje) {
+        try{
+            this.rabbitTemplate.convertAndSend(MensajeServiceUsersConfig.EXCHANGE_NAME, MensajeServiceUsersConfig.ROUTING_KEY_PROVEEDOR, mensaje);
+            System.out.println("Mensaje enviado: " + mensaje);
+        } catch (Exception e) {
+            System.err.println("Error al enviar el mensaje: " + e.getMessage());
+        }
+    }
+
+    public void enviarMensajeTurista(String mensaje) {
+        try{
+            this.rabbitTemplate.convertAndSend(MensajeServiceUsersConfig.EXCHANGE_NAME, MensajeServiceUsersConfig.ROUTING_KEY_TURISTA, mensaje);
+            System.out.println("Mensaje enviado: " + mensaje);
+        } catch (Exception e) {
+            System.err.println("Error al enviar el mensaje: " + e.getMessage());
+        }
     }
 }

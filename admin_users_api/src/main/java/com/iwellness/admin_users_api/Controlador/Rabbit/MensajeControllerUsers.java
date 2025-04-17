@@ -3,7 +3,6 @@ package com.iwellness.admin_users_api.Controlador.Rabbit;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import com.iwellness.admin_users_api.DTO.UsuariosDTO;
 import com.iwellness.admin_users_api.Entidades.Proveedor;
 import com.iwellness.admin_users_api.Entidades.Turista;
 import com.iwellness.admin_users_api.Entidades.Usuarios;

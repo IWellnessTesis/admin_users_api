@@ -8,7 +8,7 @@ public class RegistroTuristaDTO {
     private String correo;
     private String contraseña;
     private String foto;
-    private int telefono;
+    private String telefono;
     private String ciudad;
     private String pais;
     private String actividadesInteres;

@@ -90,10 +90,10 @@ public class RegistroServicio {
         // Extraer y establecer datos específicos del turista
         if (datos.containsKey("telefono")) {
             try {
-                turista.setTelefono(Integer.parseInt(datos.get("telefono").toString()));
+                turista.setTelefono(datos.get("telefono").toString());
             } catch (NumberFormatException e) {
                 // Si el valor no es un número válido, podríamos usar un valor predeterminado
-                turista.setTelefono(0);
+                turista.setTelefono("");
             }
         }
         

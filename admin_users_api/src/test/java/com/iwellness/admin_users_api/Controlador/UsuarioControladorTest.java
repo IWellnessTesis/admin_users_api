@@ -89,7 +89,7 @@ class UsuarioControladorTest {
         // Creamos el DTO con los datos de actualización (nombre, teléfono, ciudad, país)
         EditarTuristaDTO dto = new EditarTuristaDTO();
         dto.setNombre("Test User");
-        dto.setTelefono(123456789);
+        dto.setTelefono("123456789");
         dto.setCiudad("Test City");
         dto.setPais("Test Country");
 
@@ -99,7 +99,7 @@ class UsuarioControladorTest {
         usuarioInicial.setNombre("Original Name");
         Turista turistaInicial = new Turista();
         turistaInicial.setId(1L);
-        turistaInicial.setTelefono(987654321);
+        turistaInicial.setTelefono("987654321");
         turistaInicial.setCiudad("Old City");
         turistaInicial.setPais("Old Country");
         turistaInicial.setUsuarios(usuarioInicial);

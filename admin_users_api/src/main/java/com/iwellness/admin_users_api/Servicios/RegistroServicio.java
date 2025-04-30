@@ -76,6 +76,8 @@ public class RegistroServicio {
             crearTurista(usuario, datos);
         } else if ("Proveedor".equals(tipo)) {
             crearProveedor(usuario, datos);
+        } else if ("Admin".equals(tipo)) {
+            
         }
     
         return "Registro exitoso";

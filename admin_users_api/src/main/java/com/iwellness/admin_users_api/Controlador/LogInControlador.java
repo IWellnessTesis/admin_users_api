@@ -71,6 +71,11 @@ public class LogInControlador {
         return ResponseEntity.status(HttpStatus.CREATED).body(registroServicio.registrarUsuario(datos, "Proveedor"));
     }
 
+    @PostMapping(value = "/registro/Admin", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> registrarAdmin(@RequestBody Map<String, Object> datos) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(registroServicio.registrarUsuario(datos, "Admin"));
+    }
+
     
     // GET: Obtener el rol del usuario a partir del JWT
     @GetMapping("/role")

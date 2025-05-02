@@ -8,4 +8,5 @@ public class EditarTuristaDTO {
     private String telefono;
     private String ciudad;
     private String pais;
+    private String foto;
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 public class EditarProveedorDTO {
     private String nombre;
     private String nombre_empresa;
+    private String foto;
     private String coordenadaX;
     private String coordenadaY;
     private String cargoContacto;

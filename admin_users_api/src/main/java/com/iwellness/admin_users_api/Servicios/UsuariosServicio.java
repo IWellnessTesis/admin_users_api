@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.iwellness.admin_users_api.Clientes.PreferenciaFeignClient;
 import com.iwellness.admin_users_api.Clientes.ServicioFeignClient;
+import com.iwellness.admin_users_api.DTO.EditarProveedorDTO;
 import com.iwellness.admin_users_api.DTO.EditarTuristaDTO;
 import com.iwellness.admin_users_api.Entidades.Proveedor;
 import com.iwellness.admin_users_api.Entidades.Turista;
@@ -71,6 +72,7 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
 
         // Actualiza el nombre del usuario
         usuario.setNombre(dto.getNombre());
+        usuario.setFoto(dto.getFoto());
 
         // Actualiza la información del turista
         Turista turista = usuario.getTurista();
@@ -88,6 +90,39 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
 
         return usuario;
     }
+
+    public Usuarios actualizarUsuarioProveedor(Long id, EditarProveedorDTO dto) {
+    Optional<Usuarios> opUsuario = usuarioRepositorio.findById(id);
+    if (!opUsuario.isPresent()) {
+        throw new RuntimeException("Usuario no encontrado");
+    }
+
+    Usuarios usuario = opUsuario.get();
+
+    // Actualiza el nombre del usuario
+    usuario.setNombre(dto.getNombre());
+
+    usuario.setFoto(dto.getFoto());
+
+    // Obtener y actualizar la información del proveedor
+    Proveedor proveedor = usuario.getProveedor();
+    if (proveedor == null) {
+        throw new RuntimeException("Información del proveedor no encontrada");
+    }
+
+    proveedor.setNombre_empresa(dto.getNombre_empresa());
+    proveedor.setCoordenadaX(dto.getCoordenadaX());
+    proveedor.setCoordenadaY(dto.getCoordenadaY());
+    proveedor.setCargoContacto(dto.getCargoContacto());
+    proveedor.setTelefono(dto.getTelefono());
+    proveedor.setTelefonoEmpresa(dto.getTelefonoEmpresa());
+
+    // Persistir cambios
+    proveedorRepositorio.save(proveedor);
+    usuarioRepositorio.save(usuario);
+
+    return usuario;
+}
     
     public List<Usuarios> findAll() {
         return usuarioRepositorio.findAll();

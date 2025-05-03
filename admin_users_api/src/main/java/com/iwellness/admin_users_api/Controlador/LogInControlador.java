@@ -17,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -67,9 +68,35 @@ public class LogInControlador {
     }
 
     @PostMapping(value = "/registro/Proveedor", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> registrarProveedor(@RequestBody Map<String, Object> datos) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(registroServicio.registrarUsuario(datos, "Proveedor"));
+public ResponseEntity<?> registrarProveedor(@RequestBody Map<String, Object> datos) {
+    try {
+        // Registrar el proveedor
+        String resultado = registroServicio.registrarUsuario(datos, "Proveedor");
+        
+        if (resultado.equals("Registro exitoso")) {
+            // Generar token automáticamente
+            String correo = (String) datos.get("correo");
+            String contraseña = (String) datos.get("contraseña");
+            
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(correo, contraseña));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String token = jwtProveedor.TokenGenerado(authentication);
+            
+            // Devolver respuesta con token
+            Map<String, String> response = new HashMap<>();
+            response.put("message", resultado);
+            response.put("token", token);
+            
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resultado);
+        }
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+               .body("Error en el registro: " + e.getMessage());
     }
+}
 
     @PostMapping(value = "/registro/Admin", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> registrarAdmin(@RequestBody Map<String, Object> datos) {

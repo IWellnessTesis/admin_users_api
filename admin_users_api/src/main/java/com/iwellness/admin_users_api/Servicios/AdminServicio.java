@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.iwellness.admin_users_api.DTO.EditarProveedorDTO;
 import com.iwellness.admin_users_api.DTO.RegistroProveedorDTO;
 import com.iwellness.admin_users_api.DTO.RegistroTuristaDTO;
+import com.iwellness.admin_users_api.DTO.RegistroUsuarioDTO;
 import com.iwellness.admin_users_api.Entidades.Proveedor;
 import com.iwellness.admin_users_api.Entidades.Rol;
 import com.iwellness.admin_users_api.Entidades.Turista;
@@ -38,6 +39,85 @@ public class AdminServicio {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+        /**
+     * Crear un nuevo usuario genérico
+     */
+    @Transactional
+    public Map<String, Object> crearAdmin(RegistroUsuarioDTO dto) {
+        // Verificar si el correo ya está registrado
+        if (usuariosRepositorio.existsByCorreo(dto.getCorreo())) {
+            throw new RuntimeException("El correo ya está registrado");
+        }
+
+        // Obtener el rol desde el DTO o asignar un rol por defecto
+        Rol rol = rolRepositorio.findByNombre("Admin")
+                .orElseThrow(() -> new RuntimeException("Rol 'Admin' no encontrado"));
+
+        // Crear el usuario
+        Usuarios usuario = new Usuarios();
+        usuario.setNombre(dto.getNombre());
+        usuario.setCorreo(dto.getCorreo());
+        usuario.setContraseña(passwordEncoder.encode(dto.getContraseña()));
+        usuario.setFoto(dto.getFoto());
+        usuario.setRol(rol);
+
+        // Guardar el usuario
+        usuario = usuariosRepositorio.save(usuario);
+
+        // Preparar respuesta
+        Map<String, Object> respuesta = new HashMap<>();
+        respuesta.put("id", usuario.getId());
+        respuesta.put("nombre", usuario.getNombre());
+        respuesta.put("correo", usuario.getCorreo());
+        respuesta.put("mensaje", "Usuario Administrador exitosamente");
+
+        return respuesta;
+    }
+
+        /**
+     * Actualizar un usuario con rol "Administrador"
+     */
+    @Transactional
+    public Map<String, Object> actualizarAdmin(Long id, Map<String, Object> datosAdmin) {
+        // Buscar el usuario
+        Usuarios usuario = usuariosRepositorio.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Verificar que el usuario sea un administrador
+        if (!"Admin".equals(usuario.getRol().getNombre())) {
+            throw new RuntimeException("El usuario no es un administrador");
+        }
+
+        // Actualizar datos del usuario
+        if (datosAdmin.containsKey("nombre")) {
+            usuario.setNombre((String) datosAdmin.get("nombre"));
+        }
+
+        if (datosAdmin.containsKey("foto")) {
+            usuario.setFoto((String) datosAdmin.get("foto"));
+        }
+
+        // También puedes permitir actualizar el correo, si es necesario:
+        if (datosAdmin.containsKey("correo")) {
+            usuario.setCorreo((String) datosAdmin.get("correo"));
+        }
+
+        // Guardar cambios
+        usuariosRepositorio.save(usuario);
+
+        // Preparar respuesta
+        Map<String, Object> respuesta = new HashMap<>();
+        respuesta.put("id", usuario.getId());
+        respuesta.put("nombre", usuario.getNombre());
+        respuesta.put("correo", usuario.getCorreo());
+        respuesta.put("foto", usuario.getFoto());
+        respuesta.put("mensaje", "Administrador actualizado exitosamente");
+
+        return respuesta;
+    }
+
+
     
     /**
      * Crear un nuevo turista

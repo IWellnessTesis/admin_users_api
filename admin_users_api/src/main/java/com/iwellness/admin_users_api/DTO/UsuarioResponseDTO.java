@@ -24,7 +24,7 @@ public class UsuarioResponseDTO {
     @Data
     public static class TuristaInfo {
         private Long id;
-        private int telefono;
+        private String telefono;
         private String direccion;
         private String ciudad;
         private String pais;

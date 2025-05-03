@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import com.iwellness.admin_users_api.DTO.EditarProveedorDTO;
 import com.iwellness.admin_users_api.DTO.EditarTuristaDTO;
 import com.iwellness.admin_users_api.Entidades.Usuarios;
 import com.iwellness.admin_users_api.Servicios.UsuariosServicio;
@@ -47,10 +48,20 @@ public class UsuarioControlador {
         }
     }
     
-    @PutMapping("/editar/{id}")
+    @PutMapping("/editarTurista/{id}")
     public ResponseEntity<?> editarUsuarioTurista(@PathVariable Long id, @RequestBody EditarTuristaDTO dto) {
         try {
             Usuarios usuarioActualizado = usuariosServicio.actualizarUsuarioTurista(id, dto);
+            return ResponseEntity.ok(usuarioActualizado);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/editarProveedor/{id}")
+    public ResponseEntity<?> editarUsuarioProveedor(@PathVariable Long id, @RequestBody EditarProveedorDTO dto) {
+        try {
+            Usuarios usuarioActualizado = usuariosServicio.actualizarUsuarioProveedor(id, dto);
             return ResponseEntity.ok(usuarioActualizado);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());

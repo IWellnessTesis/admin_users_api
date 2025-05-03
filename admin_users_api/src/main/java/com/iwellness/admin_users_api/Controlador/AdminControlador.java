@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import com.iwellness.admin_users_api.DTO.EditarTuristaDTO;
 import com.iwellness.admin_users_api.DTO.RegistroProveedorDTO;
 import com.iwellness.admin_users_api.DTO.RegistroTuristaDTO;
+import com.iwellness.admin_users_api.DTO.RegistroUsuarioDTO;
 import com.iwellness.admin_users_api.Entidades.Usuarios;
 import com.iwellness.admin_users_api.Servicios.AdminServicio;
 import com.iwellness.admin_users_api.Servicios.UsuariosServicio;
@@ -88,6 +89,21 @@ public class AdminControlador {
     }
 
     /**
+     * Crear nuevo admin
+     */
+    @PostMapping("/admin")
+    @PreAuthorize("hasAuthority('Admin')")
+    public ResponseEntity<?> crearAdmin(@RequestBody RegistroUsuarioDTO adminDTO) {
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED)
+                   .body(adminServicio.crearAdmin(adminDTO));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                   .body("Error al crear el admin: " + e.getMessage());
+        }
+    }
+
+    /**
      * Crear nuevo turista
      */
     @PostMapping("/turistas")
@@ -144,6 +160,21 @@ public class AdminControlador {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                    .body("Error al actualizar el proveedor: " + e.getMessage());
+        }
+    }
+
+        /**
+     * Actualizar proveedor
+     */
+    @PutMapping("/admin/{id}")
+    @PreAuthorize("hasAuthority('Admin')")
+    public ResponseEntity<?> actualizarAdmin(@PathVariable Long id, @RequestBody Map<String, Object> adminData) {
+        try {
+            Map<String, Object> usuarioActualizado = adminServicio.actualizarAdmin(id, adminData);
+            return ResponseEntity.ok(usuarioActualizado);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                   .body("Error al actualizar el admin: " + e.getMessage());
         }
     }
 

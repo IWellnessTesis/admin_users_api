@@ -28,7 +28,7 @@ public class Turista {
 
 
     @Column (nullable = false)
-    private int telefono;
+    private String telefono;
 
     @Column(nullable = false)
     private String ciudad;

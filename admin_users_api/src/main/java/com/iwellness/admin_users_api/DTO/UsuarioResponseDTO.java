@@ -32,6 +32,7 @@ public class UsuarioResponseDTO {
         private String pais;
         private String genero;
         private Date fechaNacimiento;
+        private String estadoCivil;
     }
     
     @Data
@@ -67,6 +68,7 @@ public class UsuarioResponseDTO {
             turistaInfo.setPais(turista.getPais());
             turistaInfo.setGenero(turista.getGenero());
             turistaInfo.setFechaNacimiento(turista.getFechaNacimiento());
+            turistaInfo.setEstadoCivil(turista.getEstadoCivil());
             
             dto.setTuristaInfo(turistaInfo);
         }

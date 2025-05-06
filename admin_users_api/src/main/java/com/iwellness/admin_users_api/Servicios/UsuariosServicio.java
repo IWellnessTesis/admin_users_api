@@ -196,6 +196,7 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
                         turistaMap.put("pais", turista.getPais());
                         turistaMap.put("genero", turista.getGenero());
                         turistaMap.put("fechaNacimiento", turista.getFechaNacimiento());
+                        turistaMap.put("estadoCivil", turista.getEstadoCivil());
                         usuarioMap.put("turistaInfo", turistaMap);
                     } else {
                         usuarioMap.put("turistaInfo", null);
@@ -261,6 +262,7 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
                     turistaMap.put("pais", turista.getPais());
                     turistaMap.put("genero", turista.getGenero());
                     turistaMap.put("fechaNacimiento", turista.getFechaNacimiento());
+                    turistaMap.put("estadoCivil", turista.getEstadoCivil());
                     usuarioMap.put("turistaInfo", turistaMap);
                 } else {
                     usuarioMap.put("turistaInfo", null);

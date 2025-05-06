@@ -44,5 +44,7 @@ public class Turista {
     @Column
     private Date fechaNacimiento;
     
+    @Column
+    private String estadoCivil;
     
 }

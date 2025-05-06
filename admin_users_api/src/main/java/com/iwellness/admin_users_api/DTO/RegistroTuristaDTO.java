@@ -15,4 +15,5 @@ public class RegistroTuristaDTO {
     private String pais;
     private String genero;
     private Date fechaNacimiento;
+    private String estadoCivil;
 }

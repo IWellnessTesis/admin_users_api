@@ -102,6 +102,7 @@ public class RegistroServicio {
         turista.setPais((String) datos.getOrDefault("pais", ""));
         turista.setGenero((String) datos.getOrDefault("genero", ""));
         turista.setFechaNacimiento((Date) datos.getOrDefault("fechaNacimiento", ""));
+        turista.setEstadoCivil((String) datos.getOrDefault("estadoCivil", ""));
         
         // Guardar el turista
         turistaRepositorio.save(turista);

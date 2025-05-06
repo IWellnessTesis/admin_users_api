@@ -47,7 +47,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             // Generar el hash con nuestro método
             String generatedHash = generateHash(password);
             
-            logger.info("Contrasena proporcionada: {}", password);
             logger.info("Hash generado: {}", generatedHash);
             logger.info("Hash almacenado: {}", storedPasswordHash);
             
@@ -67,7 +66,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             logger.warn("Autenticacion fallida para: {}", email);
             throw new BadCredentialsException("Contrasena incorrecta");
         } catch (Exception e) {
-            logger.error("Error durante la autenticación: ", e);
+            logger.error("Error durante la autenticacion: ", e);
             throw new BadCredentialsException("Error de autenticacion: " + e.getMessage());
         }
     }

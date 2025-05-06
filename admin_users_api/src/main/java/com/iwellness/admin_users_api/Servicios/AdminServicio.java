@@ -152,6 +152,7 @@ public class AdminServicio {
         turista.setPais(dto.getPais());
         turista.setGenero(dto.getGenero());
         turista.setFechaNacimiento(dto.getFechaNacimiento());
+        turista.setEstadoCivil(dto.getEstadoCivil());
         
         // Guardar el turista
         turista = turistaRepositorio.save(turista);

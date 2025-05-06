@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
@@ -97,11 +98,30 @@ public class RegistroServicio {
                 turista.setTelefono("");
             }
         }
-        
+    
+        if (datos.containsKey("fechaNacimiento")) {
+            try {
+                Object fechaNacObj = datos.get("fechaNacimiento");
+                if (fechaNacObj instanceof String) {
+                    // Parse the string into a Date object
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                    Date fechaNac = format.parse((String) fechaNacObj);
+                    turista.setFechaNacimiento(fechaNac);
+                } else if (fechaNacObj instanceof Date) {
+                    turista.setFechaNacimiento((Date) fechaNacObj);
+                }
+            } catch (Exception e) {
+                // Handle parsing error, possibly set a default value or log error
+                turista.setFechaNacimiento(null);
+                System.err.println("Error parsing date: " + e.getMessage());
+            }
+        } else {
+            turista.setFechaNacimiento(null);
+        }
+            
         turista.setCiudad((String) datos.getOrDefault("ciudad", ""));
         turista.setPais((String) datos.getOrDefault("pais", ""));
         turista.setGenero((String) datos.getOrDefault("genero", ""));
-        turista.setFechaNacimiento((Date) datos.getOrDefault("fechaNacimiento", ""));
         turista.setEstadoCivil((String) datos.getOrDefault("estadoCivil", ""));
         
         // Guardar el turista

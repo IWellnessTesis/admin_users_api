@@ -118,7 +118,7 @@ public class LogInControladorTest {
         when(registroServicio.registrarUsuario(any(Map.class), eq("Proveedor"))).thenReturn("Registro exitoso");
         
         // Call the controller method
-        ResponseEntity<String> response = usuarioController.registrarProveedor(userData);
+        ResponseEntity<String> response = (ResponseEntity<String>) usuarioController.registrarProveedor(userData);
         
         // Verify results
         assertEquals(201, response.getStatusCodeValue());

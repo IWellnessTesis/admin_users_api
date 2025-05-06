@@ -150,7 +150,8 @@ public class AdminServicio {
         turista.setTelefono(dto.getTelefono());
         turista.setCiudad(dto.getCiudad());
         turista.setPais(dto.getPais());
-        turista.setActividadesInteres(dto.getActividadesInteres());
+        turista.setGenero(dto.getGenero());
+        turista.setFechaNacimiento(dto.getFechaNacimiento());
         
         // Guardar el turista
         turista = turistaRepositorio.save(turista);

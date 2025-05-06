@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.Map;
 
 @Service
@@ -99,7 +100,8 @@ public class RegistroServicio {
         
         turista.setCiudad((String) datos.getOrDefault("ciudad", ""));
         turista.setPais((String) datos.getOrDefault("pais", ""));
-        turista.setActividadesInteres((String) datos.getOrDefault("actividadesInteres", ""));
+        turista.setGenero((String) datos.getOrDefault("genero", ""));
+        turista.setFechaNacimiento((Date) datos.getOrDefault("fechaNacimiento", ""));
         
         // Guardar el turista
         turistaRepositorio.save(turista);

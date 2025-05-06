@@ -1,5 +1,7 @@
 package com.iwellness.admin_users_api.Entidades;
 
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -37,7 +39,10 @@ public class Turista {
     private String pais;
 
     @Column
-    private String actividadesInteres;
+    private String genero;
+
+    @Column
+    private Date fechaNacimiento;
     
     
 }

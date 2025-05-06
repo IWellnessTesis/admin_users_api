@@ -2,6 +2,7 @@ package com.iwellness.admin_users_api.DTO;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.iwellness.admin_users_api.Entidades.Proveedor;
 import com.iwellness.admin_users_api.Entidades.Rol;
 import com.iwellness.admin_users_api.Entidades.Turista;
@@ -31,6 +32,7 @@ public class UsuarioResponseDTO {
         private String ciudad;
         private String pais;
         private String genero;
+        @JsonFormat(pattern = "yyyy-MM-dd")
         private Date fechaNacimiento;
         private String estadoCivil;
     }

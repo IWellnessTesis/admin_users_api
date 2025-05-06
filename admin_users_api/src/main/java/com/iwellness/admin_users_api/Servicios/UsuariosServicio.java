@@ -82,6 +82,9 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
         turista.setTelefono(dto.getTelefono());
         turista.setCiudad(dto.getCiudad());
         turista.setPais(dto.getPais());
+        turista.setGenero(dto.getGenero());
+        turista.setFechaNacimiento(dto.getFechaNacimiento());
+        turista.setEstadoCivil(dto.getEstadoCivil());
 
         // Se persisten las actualizaciones
         // Debido al cascade en la relación uno a uno, se puede guardar primero el turista

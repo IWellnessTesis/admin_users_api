@@ -6,6 +6,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 @Service
@@ -83,26 +85,73 @@ public class RegistroServicio {
         return "Registro exitoso";
     }
     
+    
     private void crearTurista(Usuarios usuario, Map<String, Object> datos) {
         Turista turista = new Turista();
         turista.setUsuarios(usuario);
+        
+        // Log para ver todos los datos recibidos
+        System.out.println("Datos recibidos para registro de turista: " + datos);
         
         // Extraer y establecer datos específicos del turista
         if (datos.containsKey("telefono")) {
             try {
                 turista.setTelefono(datos.get("telefono").toString());
+                System.out.println("Teléfono establecido: " + turista.getTelefono());
             } catch (NumberFormatException e) {
                 // Si el valor no es un número válido, podríamos usar un valor predeterminado
                 turista.setTelefono("");
+                System.out.println("Error al procesar teléfono, establecido valor vacío");
             }
         }
-        
+    
+        if (datos.containsKey("fechaNacimiento")) {
+            try {
+                Object fechaNacObj = datos.get("fechaNacimiento");
+                System.out.println("Objeto fechaNacimiento recibido: " + fechaNacObj + " de tipo: " + fechaNacObj.getClass().getName());
+                
+                if (fechaNacObj instanceof String) {
+                    // Parse the string into a Date object
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                    Date fechaNac = format.parse((String) fechaNacObj);
+                    turista.setFechaNacimiento(fechaNac);
+                    System.out.println("Fecha de nacimiento parseada desde String: " + fechaNac);
+                } else if (fechaNacObj instanceof Date) {
+                    turista.setFechaNacimiento((Date) fechaNacObj);
+                    System.out.println("Fecha de nacimiento establecida desde Date: " + fechaNacObj);
+                }
+            } catch (Exception e) {
+                // Handle parsing error, possibly set a default value or log error
+                turista.setFechaNacimiento(null);
+                System.err.println("Error parsing date: " + e.getMessage());
+            }
+        } else {
+            turista.setFechaNacimiento(null);
+            System.out.println("No se proporcionó fecha de nacimiento");
+        }
+            
         turista.setCiudad((String) datos.getOrDefault("ciudad", ""));
+        System.out.println("Ciudad establecida: " + turista.getCiudad());
+        
         turista.setPais((String) datos.getOrDefault("pais", ""));
-        turista.setActividadesInteres((String) datos.getOrDefault("actividadesInteres", ""));
+        System.out.println("País establecido: " + turista.getPais());
+        
+        turista.setGenero((String) datos.getOrDefault("genero", ""));
+        System.out.println("Género establecido: " + turista.getGenero());
+        
+        // Verificar específicamente el estado civil
+        if (datos.containsKey("estadoCivil")) {
+            String estadoCivil = (String) datos.get("estadoCivil");
+            turista.setEstadoCivil(estadoCivil);
+            System.out.println("Estado civil establecido explícitamente: " + estadoCivil);
+        } else {
+            turista.setEstadoCivil("");
+            System.out.println("No se encontró 'estadoCivil' en los datos, establecido a vacío");
+        }
         
         // Guardar el turista
-        turistaRepositorio.save(turista);
+        Turista turistaGuardado = turistaRepositorio.save(turista);
+        System.out.println("Turista guardado con ID: " + turistaGuardado.getId() + ", Estado Civil: " + turistaGuardado.getEstadoCivil());
     }
     
     private void crearProveedor(Usuarios usuario, Map<String, Object> datos) {

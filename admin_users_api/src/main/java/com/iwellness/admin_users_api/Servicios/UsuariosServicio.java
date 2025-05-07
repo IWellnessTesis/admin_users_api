@@ -82,6 +82,9 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
         turista.setTelefono(dto.getTelefono());
         turista.setCiudad(dto.getCiudad());
         turista.setPais(dto.getPais());
+        turista.setGenero(dto.getGenero());
+        turista.setFechaNacimiento(dto.getFechaNacimiento());
+        turista.setEstadoCivil(dto.getEstadoCivil());
 
         // Se persisten las actualizaciones
         // Debido al cascade en la relación uno a uno, se puede guardar primero el turista
@@ -194,7 +197,9 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
                         turistaMap.put("telefono", turista.getTelefono());
                         turistaMap.put("ciudad", turista.getCiudad());
                         turistaMap.put("pais", turista.getPais());
-                        turistaMap.put("actividadesInteres", turista.getActividadesInteres());
+                        turistaMap.put("genero", turista.getGenero());
+                        turistaMap.put("fechaNacimiento", turista.getFechaNacimiento());
+                        turistaMap.put("estadoCivil", turista.getEstadoCivil());
                         usuarioMap.put("turistaInfo", turistaMap);
                     } else {
                         usuarioMap.put("turistaInfo", null);
@@ -258,7 +263,9 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
                     turistaMap.put("telefono", turista.getTelefono());
                     turistaMap.put("ciudad", turista.getCiudad());
                     turistaMap.put("pais", turista.getPais());
-                    turistaMap.put("actividadesInteres", turista.getActividadesInteres());
+                    turistaMap.put("genero", turista.getGenero());
+                    turistaMap.put("fechaNacimiento", turista.getFechaNacimiento());
+                    turistaMap.put("estadoCivil", turista.getEstadoCivil());
                     usuarioMap.put("turistaInfo", turistaMap);
                 } else {
                     usuarioMap.put("turistaInfo", null);

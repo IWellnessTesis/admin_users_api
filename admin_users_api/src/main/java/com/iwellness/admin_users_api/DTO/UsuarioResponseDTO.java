@@ -1,5 +1,8 @@
 package com.iwellness.admin_users_api.DTO;
 
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.iwellness.admin_users_api.Entidades.Proveedor;
 import com.iwellness.admin_users_api.Entidades.Rol;
 import com.iwellness.admin_users_api.Entidades.Turista;
@@ -28,7 +31,10 @@ public class UsuarioResponseDTO {
         private String direccion;
         private String ciudad;
         private String pais;
-        private String actividadesInteres;
+        private String genero;
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        private Date fechaNacimiento;
+        private String estadoCivil;
     }
     
     @Data
@@ -62,7 +68,9 @@ public class UsuarioResponseDTO {
             turistaInfo.setTelefono(turista.getTelefono());
             turistaInfo.setCiudad(turista.getCiudad());
             turistaInfo.setPais(turista.getPais());
-            turistaInfo.setActividadesInteres(turista.getActividadesInteres());
+            turistaInfo.setGenero(turista.getGenero());
+            turistaInfo.setFechaNacimiento(turista.getFechaNacimiento());
+            turistaInfo.setEstadoCivil(turista.getEstadoCivil());
             
             dto.setTuristaInfo(turistaInfo);
         }

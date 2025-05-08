@@ -155,13 +155,7 @@ public class UsuarioControlador {
     @GetMapping("/proveedores")
     public ResponseEntity<?> obtenerProveedores() {
         try {
-            Usuarios usuarioActual = getUsuarioActual();
-            
-            // Solo administradores pueden ver todos los proveedores
-            if (!isAdmin(usuarioActual)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                       .body("No tiene permisos para ver todos los proveedores");
-            }
+
             
             return ResponseEntity.ok(usuariosServicio.obtenerProveedores());
         } catch (Exception e) {

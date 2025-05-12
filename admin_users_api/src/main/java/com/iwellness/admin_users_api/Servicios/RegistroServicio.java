@@ -167,6 +167,10 @@ public class RegistroServicio {
         proveedor.setTelefonoEmpresa((String) datos.getOrDefault("telefonoEmpresa", ""));
         
         // Guardar el proveedor
-        proveedorRepositorio.save(proveedor);
+        Proveedor proveedorGuardado = proveedorRepositorio.save(proveedor);
+
+        //Asociar el proveedor con el usuario
+        usuario.setProveedor(proveedorGuardado);
+        usuariosRepositorio.save(usuario);
     }
 }

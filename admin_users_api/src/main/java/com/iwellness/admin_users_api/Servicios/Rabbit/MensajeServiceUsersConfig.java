@@ -12,12 +12,11 @@ import org.springframework.context.annotation.Configuration;
 
 public class MensajeServiceUsersConfig {
     public static final String EXCHANGE_NAME = "message_exchange";
-    public static final String QUEUE_NAME_USUARIO = "queue_users"; //cola para usuarios
-    public static final String ROUTING_KEY_USERS = "my_routing_key_users";
     public static final String QUEUE_NAME_PROVEEDOR = "queue_proveedor"; //cola para proveedores
-    public static final String QUEUE_NAME_TURISTA = "queue_turista"; //cola para turistas
     public static final String ROUTING_KEY_PROVEEDOR = "my_routing_key_proveedor";
-    public static final String ROUTING_KEY_TURISTA = "my_routing_key_turista";
+    public static final String QUEUE_NAME_TURISTA = "queue_turist"; //cola para turistas
+    public static final String ROUTING_KEY_TURISTA= "my_routing_key_turista";
+
 
 
 
@@ -38,10 +37,6 @@ public class MensajeServiceUsersConfig {
         return template;
     }
 
-    @Bean
-    public Queue queueUsuario() {
-        return new Queue(QUEUE_NAME_USUARIO, true);
-    }
 
     @Bean
     public Queue queueProveedor() {
@@ -53,11 +48,6 @@ public class MensajeServiceUsersConfig {
         return new Queue(QUEUE_NAME_TURISTA, true);
     }
 
-
-    @Bean
-    public Binding bindingUsuario(Queue queueUsuario, TopicExchange exchange) {
-        return BindingBuilder.bind(queueUsuario).to(exchange).with(ROUTING_KEY_USERS);
-    }
 
     @Bean
     public Binding bindingProveedor(Queue queueProveedor, TopicExchange exchange) {

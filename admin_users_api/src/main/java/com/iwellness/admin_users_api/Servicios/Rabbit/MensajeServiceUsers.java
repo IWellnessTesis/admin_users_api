@@ -10,32 +10,61 @@ public class MensajeServiceUsers {
 
     public MensajeServiceUsers(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
-    }
 
-    public void enviarMensajeUsuarios(String mensaje) {
-        try{
-            this.rabbitTemplate.convertAndSend(MensajeServiceUsersConfig.EXCHANGE_NAME, MensajeServiceUsersConfig.ROUTING_KEY_USERS, mensaje);
-            System.out.println("Mensaje enviado: " + mensaje);
+        try {
+            System.out.println("=== VERIFICANDO CONEXIÓN A RABBITMQ ===");
+            rabbitTemplate.execute(channel -> {
+                System.out.println("Conexión a RabbitMQ establecida correctamente");
+                return null;
+            });
         } catch (Exception e) {
-            System.err.println("Error al enviar el mensaje: " + e.getMessage());
+            System.err.println("Error al conectar con RabbitMQ: " + e.getMessage());
+            e.printStackTrace();
         }
     }
+
 
     public void enviarMensajeProveedor(String mensaje) {
         try{
-            this.rabbitTemplate.convertAndSend(MensajeServiceUsersConfig.EXCHANGE_NAME, MensajeServiceUsersConfig.ROUTING_KEY_PROVEEDOR, mensaje);
-            System.out.println("Mensaje enviado: " + mensaje);
+            System.out.println("=== INICIO ENVÍO A RABBITMQ ===");
+            System.out.println("Exchange: " + MensajeServiceUsersConfig.EXCHANGE_NAME);
+            System.out.println("Routing Key: " + MensajeServiceUsersConfig.ROUTING_KEY_PROVEEDOR);
+            System.out.println("Mensaje a enviar: " + mensaje);
+
+            // Enviar mensaje
+            rabbitTemplate.convertAndSend(
+                MensajeServiceUsersConfig.EXCHANGE_NAME,
+                MensajeServiceUsersConfig.ROUTING_KEY_PROVEEDOR,
+                mensaje
+            );
+
+            // Log después de enviar
+            System.out.println("=== MENSAJE ENVIADO EXITOSAMENTE ===");
         } catch (Exception e) {
             System.err.println("Error al enviar el mensaje: " + e.getMessage());
         }
     }
 
-    public void enviarMensajeTurista(String mensaje) {
+    public void enviarMensajeTurista(String mensaje){
         try{
-            this.rabbitTemplate.convertAndSend(MensajeServiceUsersConfig.EXCHANGE_NAME, MensajeServiceUsersConfig.ROUTING_KEY_TURISTA, mensaje);
-            System.out.println("Mensaje enviado: " + mensaje);
+            System.out.println("=== INICIO ENVÍO A RABBITMQ ===");
+            System.out.println("Exchange: " + MensajeServiceUsersConfig.EXCHANGE_NAME);
+            System.out.println("Routing Key: " + MensajeServiceUsersConfig.ROUTING_KEY_TURISTA);
+            System.out.println("Mensaje a enviar: " + mensaje);
+
+            // Enviar mensaje
+            rabbitTemplate.convertAndSend(
+                MensajeServiceUsersConfig.EXCHANGE_NAME,
+                MensajeServiceUsersConfig.ROUTING_KEY_TURISTA,
+                mensaje
+            );
+
+            // Log después de enviar
+            System.out.println("=== MENSAJE ENVIADO EXITOSAMENTE ===");
         } catch (Exception e) {
             System.err.println("Error al enviar el mensaje: " + e.getMessage());
         }
+
     }
+
 }

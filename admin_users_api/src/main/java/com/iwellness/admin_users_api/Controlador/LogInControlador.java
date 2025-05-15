@@ -90,6 +90,7 @@ public class LogInControlador {
     
                 // Construir el DTO solo con los campos necesarios
                 TuristaDTO turistaDTO = new TuristaDTO();
+                turistaDTO.setIdTurista(turista.getId());
                 turistaDTO.setNombre(nuevoTurista.getNombre());
                 turistaDTO.setTelefono(turista.getTelefono());
                 turistaDTO.setCiudad(turista.getCiudad());
@@ -130,9 +131,9 @@ public ResponseEntity<?> registrarProveedor(@RequestBody Map<String, Object> dat
             //Obtener el proveedor recien registrado
             Usuarios nuevoProveedor = usuariosServicio.findByCorreo(correo).orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
 
-            
             // Convertir el token a DTO
             ProveedorDTO proveedorDTO = new ProveedorDTO();
+            proveedorDTO.setIdProveedor(nuevoProveedor.getProveedor().getId());
             proveedorDTO.setNombre(nuevoProveedor.getNombre());
             proveedorDTO.setNombre_empresa(nuevoProveedor.getProveedor().getNombre_empresa());
             proveedorDTO.setCargoContacto(nuevoProveedor.getProveedor().getCargoContacto());

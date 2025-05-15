@@ -3,18 +3,31 @@ package com.iwellness.admin_users_api.Seguridad;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Optional;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iwellness.admin_users_api.Entidades.Proveedor;
+import com.iwellness.admin_users_api.Entidades.Usuarios;
+import com.iwellness.admin_users_api.Repositorios.ProveedorRepositorio;
+import com.iwellness.admin_users_api.Repositorios.UsuariosRepositorio;
 
 @Component
 public class JWTProveedor {
+
+    @Autowired
+private UsuariosRepositorio usuariosRepositorio;
+
+@Autowired
+private ProveedorRepositorio proveedorRepositorio;
     
     private static final Logger logger = LoggerFactory.getLogger(JWTProveedor.class);
     private static final String SECRET_KEY = "estaEsUnaClaveSecretaMuySeguraParaFirmarLosTokensJWT";
@@ -26,6 +39,20 @@ public class JWTProveedor {
         try {
             String username = authentication.getName();
             logger.info("Generando token para usuario: {}", username);
+
+                // Buscar el usuario por correo (o por nombre, según tu login)
+            Optional<Usuarios> usuarioOpt = usuariosRepositorio.findByCorreo(username);
+            if (!usuarioOpt.isPresent()) {
+                throw new RuntimeException("Usuario no encontrado: " + username);
+            }
+            Usuarios usuario = usuarioOpt.get();
+
+            // Obtener el proveedor relacionado (si existe)
+            Proveedor proveedor = usuario.getProveedor(); // Si tienes la relación directa
+            // O, si necesitas buscarlo por el id del usuario:
+            // Proveedor proveedor = proveedorRepositorio.findByUsuariosId(usuario.getId());
+
+        Long idProveedor = proveedor != null ? proveedor.getId() : null;
             
             // Generar fechas para el token
             Date currentDate = new Date();
@@ -44,7 +71,8 @@ public class JWTProveedor {
                 username,
                 rol,
                 currentDate.getTime() / 1000,
-                expireDate.getTime() / 1000
+                expireDate.getTime() / 1000,
+                idProveedor
             ));
             
             // Crear el header
@@ -120,14 +148,16 @@ public class JWTProveedor {
         private String rol;
         private long iat;
         private long exp;
+        private Long idProveedor; 
         
         public JwtPayload() {}
         
-        public JwtPayload(String sub, String rol, long iat, long exp) {
+        public JwtPayload(String sub, String rol, long iat, long exp, Long idProveedor) {
             this.sub = sub;
             this.rol = rol;
             this.iat = iat;
             this.exp = exp;
+            this.idProveedor = idProveedor;
         }
         
         public String getSub() { return sub; }
@@ -141,5 +171,8 @@ public class JWTProveedor {
         
         public long getExp() { return exp; }
         public void setExp(long exp) { this.exp = exp; }
+
+        public Long getIdProveedor() { return idProveedor; }
+        public void setIdProveedor(Long idProveedor) { this.idProveedor = idProveedor; }
     }
 }

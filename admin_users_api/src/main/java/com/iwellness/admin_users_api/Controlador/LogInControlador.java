@@ -1,7 +1,10 @@
 package com.iwellness.admin_users_api.Controlador;
 
 import com.iwellness.admin_users_api.DTO.UsuariosDTO;
+import com.iwellness.admin_users_api.Entidades.PasswordResetToken;
 import com.iwellness.admin_users_api.Entidades.Usuarios;
+import com.iwellness.admin_users_api.Repositorios.PasswordResetTokenRepository;
+import com.iwellness.admin_users_api.Servicios.EmailService;
 import com.iwellness.admin_users_api.Servicios.RegistroServicio;
 import com.iwellness.admin_users_api.Servicios.UsuariosServicio;
 import com.iwellness.admin_users_api.Seguridad.CustomUserDetailsService;
@@ -16,16 +19,20 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "*")
 public class LogInControlador {
 
     private static final Logger logger = LoggerFactory.getLogger(LogInControlador.class);
@@ -42,6 +49,14 @@ public class LogInControlador {
     @Autowired
     private JWTProveedor jwtProveedor;
 
+    @Autowired
+    private PasswordResetTokenRepository passwordResetTokenRepository;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
@@ -146,7 +161,58 @@ public ResponseEntity<?> registrarProveedor(@RequestBody Map<String, Object> dat
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido");
         }
-        
     }
+
+    @PostMapping("/request-reset-password")
+    public ResponseEntity<?> requestResetPassword(@RequestParam String correo) {
+        Optional<Usuarios> usuario = usuariosServicio.findByCorreo(correo);
+        if (usuario.isEmpty()) {
+            return ResponseEntity.badRequest().body("Correo no encontrado");
+        }
+
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken resetToken = new PasswordResetToken();
+        resetToken.setToken(token);
+        resetToken.setCorreo(correo);
+        resetToken.setExpiryDate(LocalDateTime.now().plusMinutes(15));
+        passwordResetTokenRepository.save(resetToken);
+
+        String enlaceRecuperacion = "http://localhost:4200/restablecer?token=" + token;
+
+        String cuerpoCorreo = "Hola " + usuario.get().getNombre() + ",\n\n"
+            + "Haz clic en el siguiente enlace para restablecer tu contraseña:\n"
+            + enlaceRecuperacion + "\n\n"
+            + "Este enlace expirará en 15 minutos.\n\n"
+            + "Saludos,\nEquipo I-Wellness";
+
+        emailService.enviarCorreo(correo, "Recuperación de contraseña", cuerpoCorreo);
+
+        return ResponseEntity.ok("Correo de recuperación enviado");
+    }
+
+    @PostMapping("/reset-password")
+public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestParam String nuevaContrasena) {
+    Optional<PasswordResetToken> resetToken = passwordResetTokenRepository.findByToken(token);
+
+    if (resetToken.isEmpty() || resetToken.get().getExpiryDate().isBefore(LocalDateTime.now())) {
+        return ResponseEntity.badRequest().body(Map.of("mensaje", "Token inválido o expirado"));
+    }
+
+    Optional<Usuarios> usuario = usuariosServicio.findByCorreo(resetToken.get().getCorreo());
+
+    if (usuario.isEmpty()) {
+        return ResponseEntity.badRequest().body(Map.of("mensaje", "Usuario no encontrado"));
+    }
+
+    Usuarios user = usuario.get();
+    user.setContraseña(passwordEncoder.encode(nuevaContrasena)); 
+    usuariosServicio.save(user);
+
+    passwordResetTokenRepository.delete(resetToken.get());
+
+    return ResponseEntity.ok(Map.of("mensaje", "Contraseña restablecida correctamente"));
+}
+
+
 
 }

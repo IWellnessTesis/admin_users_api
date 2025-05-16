@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwellness.admin_users_api.DTO.EditarProveedorDTO;
 import com.iwellness.admin_users_api.DTO.EditarTuristaDTO;
 import com.iwellness.admin_users_api.DTO.ProveedorDTO;
+import com.iwellness.admin_users_api.DTO.TuristaDTO;
 import com.iwellness.admin_users_api.Entidades.Usuarios;
 import com.iwellness.admin_users_api.Servicios.UsuariosServicio;
 import com.iwellness.admin_users_api.Servicios.Rabbit.MensajeServiceUsers;
@@ -105,9 +106,32 @@ public class UsuarioControlador {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                        .body("No tiene permisos para editar este usuario");
             }
-            
+
             Usuarios usuarioActualizado = usuariosServicio.actualizarUsuarioTurista(id, dto);
-            return ResponseEntity.ok(usuarioActualizado);
+
+            // Convertir a DTO
+            TuristaDTO turistaDTO = new TuristaDTO();
+            turistaDTO.setIdTurista(usuarioActualizado.getId());
+            turistaDTO.setNombre(usuarioActualizado.getNombre());
+            turistaDTO.setTelefono(usuarioActualizado.getTurista().getTelefono());
+            turistaDTO.setFechaNacimiento(
+                usuarioActualizado.getTurista().getFechaNacimiento() == null ? null :
+                new java.sql.Date(usuarioActualizado.getTurista().getFechaNacimiento().getTime())
+            );
+            turistaDTO.setGenero(usuarioActualizado.getTurista().getGenero());
+            turistaDTO.setCiudad(usuarioActualizado.getTurista().getCiudad());
+            turistaDTO.setPais(usuarioActualizado.getTurista().getPais());
+            turistaDTO.setEstadoCivil(usuarioActualizado.getTurista().getEstadoCivil());
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(turistaDTO);
+            System.out.println("Mensaje enviado a la cola: " + json);
+
+            // Enviar mensaje a la cola
+            mensajeServiceUsers.enviarMensajeTurista(json);
+
+
+            return ResponseEntity.ok(turistaDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
@@ -138,6 +162,7 @@ public class UsuarioControlador {
             //3. Convertir a DTO y enviar a la cola
             System.out.println("Convertiendo a DTO y enviando a la cola");
             ProveedorDTO proveedorDTO = new ProveedorDTO();
+            proveedorDTO.setIdProveedor(usuarioProveedorActualizado.getId());
             proveedorDTO.setNombre(usuarioProveedorActualizado.getNombre());
             proveedorDTO.setNombre_empresa(usuarioProveedorActualizado.getProveedor().getNombre_empresa());
             proveedorDTO.setCargoContacto(usuarioProveedorActualizado.getProveedor().getCargoContacto());
@@ -209,7 +234,7 @@ public class UsuarioControlador {
             }
 
 
-            return ResponseEntity.ok("Proveedores enviados a la cola correctamente");
+            return ResponseEntity.ok(proveedoresDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Error al enviar proveedores a la cola: " + e.getMessage());
@@ -235,7 +260,8 @@ public class UsuarioControlador {
                 String json = objectMapper.writeValueAsString(turista.getTuristaInfo());
                 mensajeServiceUsers.enviarMensajeTurista(json);
             }
-            return ResponseEntity.ok("Turistas enviados a la cola correctamente");
+            // Ahora devolvemos la lista de turistas en vez de solo un mensaje
+            return ResponseEntity.ok(turistas);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                    .body("Error al obtener los turistas: " + e.getMessage());

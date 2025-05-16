@@ -8,10 +8,11 @@ import lombok.Data;
 @Data
 public class TuristaDTO {
     private Long idTurista;
-      private String nombre;
+    private String nombre;
     private String telefono;
     private String ciudad;
     private String pais;
     private String genero;
     private String estadoCivil;
+    private Date fechaNacimiento;
 }

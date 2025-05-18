@@ -1,12 +1,20 @@
 package com.iwellness.admin_users_api.Controlador;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iwellness.admin_users_api.DTO.UsuarioResponseDTO;
+import com.iwellness.admin_users_api.DTO.ProveedorDTO;
+import com.iwellness.admin_users_api.DTO.RegistroProveedorDTO;
+import com.iwellness.admin_users_api.DTO.TuristaDTO;
 import com.iwellness.admin_users_api.DTO.UsuariosDTO;
 import com.iwellness.admin_users_api.Entidades.PasswordResetToken;
+import com.iwellness.admin_users_api.Entidades.Turista;
 import com.iwellness.admin_users_api.Entidades.Usuarios;
 import com.iwellness.admin_users_api.Repositorios.PasswordResetTokenRepository;
 import com.iwellness.admin_users_api.Servicios.EmailService;
+import com.iwellness.admin_users_api.Repositorios.TuristaRepositorio;
 import com.iwellness.admin_users_api.Servicios.RegistroServicio;
 import com.iwellness.admin_users_api.Servicios.UsuariosServicio;
+import com.iwellness.admin_users_api.Servicios.Rabbit.MensajeServiceUsers;
 import com.iwellness.admin_users_api.Seguridad.CustomUserDetailsService;
 import com.iwellness.admin_users_api.Seguridad.JWTProveedor;
 
@@ -44,6 +52,8 @@ public class LogInControlador {
     private UsuariosServicio usuariosServicio;
 
     @Autowired
+    private MensajeServiceUsers mensajeServiceUsers;
+    @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
@@ -57,6 +67,8 @@ public class LogInControlador {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private TuristaRepositorio turistaRepositorio;
     
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
@@ -79,7 +91,40 @@ public class LogInControlador {
 
     @PostMapping(value = "/registro/Turista", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> registrarTurista(@RequestBody Map<String, Object> datos) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(registroServicio.registrarUsuario(datos, "Turista"));
+        try {
+            String resultado = registroServicio.registrarUsuario(datos, "Turista");
+    
+            if (resultado.equals("Registro exitoso")) {
+                String correo = (String) datos.get("correo");
+                Usuarios nuevoTurista = usuariosServicio.findByCorreo(correo)
+                    .orElseThrow(() -> new RuntimeException("Turista no encontrado"));
+    
+                // Busca el objeto Turista asociado al usuario
+                Turista turista = turistaRepositorio.findByUsuarios(nuevoTurista)
+                    .orElseThrow(() -> new RuntimeException("Turista no encontrado para el usuario"));
+    
+                // Construir el DTO solo con los campos necesarios
+                TuristaDTO turistaDTO = new TuristaDTO();
+                turistaDTO.setIdTurista(turista.getId());
+                turistaDTO.setNombre(nuevoTurista.getNombre());
+                turistaDTO.setTelefono(turista.getTelefono());
+                turistaDTO.setCiudad(turista.getCiudad());
+                turistaDTO.setPais(turista.getPais());
+                turistaDTO.setGenero(turista.getGenero());
+                turistaDTO.setEstadoCivil(turista.getEstadoCivil());
+    
+                ObjectMapper objectMapper = new ObjectMapper();
+                String json = objectMapper.writeValueAsString(turistaDTO);
+                mensajeServiceUsers.enviarMensajeTurista(json);
+    
+                return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resultado);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body("Error en el registro: " + e.getMessage());
+        }
     }
 
     @PostMapping(value = "/registro/Proveedor", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -97,6 +142,24 @@ public ResponseEntity<?> registrarProveedor(@RequestBody Map<String, Object> dat
                 new UsernamePasswordAuthenticationToken(correo, contraseña));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String token = jwtProveedor.TokenGenerado(authentication);
+
+            //Obtener el proveedor recien registrado
+            Usuarios nuevoProveedor = usuariosServicio.findByCorreo(correo).orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
+
+            // Convertir el token a DTO
+            ProveedorDTO proveedorDTO = new ProveedorDTO();
+            proveedorDTO.setIdProveedor(nuevoProveedor.getProveedor().getId());
+            proveedorDTO.setNombre(nuevoProveedor.getNombre());
+            proveedorDTO.setNombre_empresa(nuevoProveedor.getProveedor().getNombre_empresa());
+            proveedorDTO.setCargoContacto(nuevoProveedor.getProveedor().getCargoContacto());
+            proveedorDTO.setTelefono(nuevoProveedor.getProveedor().getTelefono());
+            proveedorDTO.setTelefonoEmpresa(nuevoProveedor.getProveedor().getTelefonoEmpresa());
+            proveedorDTO.setCoordenadaX(nuevoProveedor.getProveedor().getCoordenadaX());
+            proveedorDTO.setCoordenadaY(nuevoProveedor.getProveedor().getCoordenadaY());
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(proveedorDTO);
+            mensajeServiceUsers.enviarMensajeProveedor(json);
             
             // Devolver respuesta con token
             Map<String, String> response = new HashMap<>();

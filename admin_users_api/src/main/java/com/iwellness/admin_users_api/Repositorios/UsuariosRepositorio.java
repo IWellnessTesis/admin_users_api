@@ -55,4 +55,5 @@ public interface  UsuariosRepositorio extends JpaRepository<Usuarios, Long> {
 
     @Query("SELECT u FROM Usuarios u WHERE u.rol.id = 2")
     List<Usuarios> getAllProveedores();
+
 }

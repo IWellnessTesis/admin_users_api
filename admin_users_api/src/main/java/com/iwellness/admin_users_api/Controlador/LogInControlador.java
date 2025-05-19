@@ -148,7 +148,7 @@ public ResponseEntity<?> registrarProveedor(@RequestBody Map<String, Object> dat
 
             // Convertir el token a DTO
             ProveedorDTO proveedorDTO = new ProveedorDTO();
-            proveedorDTO.setIdProveedor(nuevoProveedor.getProveedor().getId());
+            proveedorDTO.setIdProveedor(nuevoProveedor.getId());
             proveedorDTO.setNombre(nuevoProveedor.getNombre());
             proveedorDTO.setNombre_empresa(nuevoProveedor.getProveedor().getNombre_empresa());
             proveedorDTO.setCargoContacto(nuevoProveedor.getProveedor().getCargoContacto());

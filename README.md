@@ -22,6 +22,7 @@ Forma parte de una arquitectura basada en microservicios orientada al ecosistema
 - Firebase Authentication / JWT
 - Maven
 - SQLite
+- RabbitMQ
 
 ## 📡 Endpoints principales
 
@@ -57,6 +58,6 @@ Este microservicio debe ejecutarse junto con los siguientes componentes del sist
 Además, para la publicación y procesamiento de mensajes, deben estar en funcionamiento los siguientes servicios:
 - Servidor de mensajería [`IWellness_Data_Services`](https://github.com/IWellnessTesis/IWellness_data_services/tree/main).
 - Microservicio de procesamiento de datos [`Queue_Rabbit`](https://github.com/IWellnessTesis/Queue-Rabbit).
-- Base de datos de persistencia (MySQL) [`IWellness_Data_Services`](https://github.com/IWellnessTesis/IWellness_data_services/tree/main).
+- Base de datos de persistencia (MySQL) [`IWellness_DB`](https://github.com/IWellnessTesis/IWellness-DB).
 
 

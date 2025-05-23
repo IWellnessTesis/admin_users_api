@@ -21,8 +21,7 @@ Forma parte de una arquitectura basada en microservicios orientada al ecosistema
 - Spring Security
 - Firebase Authentication / JWT
 - Maven
-- Docker (opcional)
-- MongoDB o PostgreSQL (según configuración)
+- SQLite
 
 ## 📡 Endpoints principales
 

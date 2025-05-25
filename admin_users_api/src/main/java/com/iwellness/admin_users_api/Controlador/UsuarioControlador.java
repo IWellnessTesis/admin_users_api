@@ -37,18 +37,18 @@ public class UsuarioControlador {
 
 
     // Método helper para obtener el usuario actual
-    private Usuarios getUsuarioActual() {
+    Usuarios getUsuarioActual() {
         String emailUsuarioActual = SecurityContextHolder.getContext().getAuthentication().getName();
         return usuariosServicio.findByCorreo(emailUsuarioActual).orElse(null);
     }
 
     // Método helper para verificar si es admin
-    private boolean isAdmin(Usuarios usuario) {
+    boolean isAdmin(Usuarios usuario) {
         return usuario != null && "Admin".equals(usuario.getRol().getNombre());
     }
 
     // Método helper para verificar si es el propietario
-    private boolean isOwner(Usuarios usuario, Long id) {
+    boolean isOwner(Usuarios usuario, Long id) {
         return usuario != null && usuario.getId().equals(id);
     }
 

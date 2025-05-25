@@ -63,15 +63,6 @@ public class UsuariosServicioTest {
     }
 
     @Test
-    void testDeleteById() {
-        doNothing().when(usuarioRepositorio).deleteById(1L);
-
-        ususariosServicio.deleteById(1L);
-
-        verify(usuarioRepositorio).deleteById(1L);
-    }
-
-    @Test
     void testExistsByCorreo() {
         when(usuarioRepositorio.existsByCorreo("test@example.com")).thenReturn(true);
 

@@ -1,6 +1,9 @@
 package com.iwellness.admin_users_api.Entidades;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
@@ -11,20 +14,23 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+@ToString(exclude = {"usuarios"})
 public class Turista {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_usuarios_turista")
     Long id;
 
 
     @OneToOne
-    @JsonIgnore
-    @JoinColumn(name = "usuarios_id") // FK 
+    @JoinColumn(name = "usuarios_id", referencedColumnName = "id_usuarios", nullable = false)
+    @JsonBackReference
     private Usuarios usuarios;
 
+
     @Column (nullable = false)
-    private int telefono;
+    private String telefono;
 
     @Column(nullable = false)
     private String ciudad;
@@ -33,7 +39,13 @@ public class Turista {
     private String pais;
 
     @Column
-    private String actividadesInteres;
+    private String genero;
+
+    @Column
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private Date fechaNacimiento;
     
+    @Column(name = "estado_civil")
+    private String estadoCivil;
     
 }

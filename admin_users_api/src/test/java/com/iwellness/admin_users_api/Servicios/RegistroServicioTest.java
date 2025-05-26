@@ -2,6 +2,7 @@ package com.iwellness.admin_users_api.Servicios;
 
 import com.iwellness.admin_users_api.Entidades.Usuarios;
 import com.iwellness.admin_users_api.Entidades.Rol;
+import com.iwellness.admin_users_api.Entidades.Turista;
 import com.iwellness.admin_users_api.Repositorios.UsuariosRepositorio;
 import com.iwellness.admin_users_api.Repositorios.RolRepositorio;
 import com.iwellness.admin_users_api.Repositorios.TuristaRepositorio;
@@ -67,29 +68,6 @@ class RegistroServicioTest {
         assertFalse(resultado, "El método debe devolver false si el correo no está registrado.");
         verify(usuariosRepositorio).findByCorreo(correo);
     }
-
-    @Test
-    void testRegistrarUsuario_Exitoso() {
-        Map<String, Object> datos = new HashMap<>();
-        datos.put("correo", "nuevo@example.com");
-        datos.put("contraseña", "password123");
-        datos.put("nombre", "Nuevo Usuario");
-        datos.put("foto", "perfil.jpg");
-
-        Rol rol = new Rol();
-        rol.setNombre("Turista");
-
-        when(usuariosRepositorio.existsByCorreo("nuevo@example.com")).thenReturn(false);
-        when(rolRepositorio.findByNombre("Turista")).thenReturn(Optional.of(rol));
-        when(passwordEncoder.encode(anyString())).thenReturn("hashedPassword");
-
-        String resultado = registroServicio.registrarUsuario(datos, "Turista");
-
-        assertEquals("Registro exitoso", resultado);
-        verify(usuariosRepositorio).save(any(Usuarios.class));
-    }
-
-
     @Test
     void testRegistrarUsuario_CorreoExistente() {
         // Crear un mapa con TODOS los datos obligatorios

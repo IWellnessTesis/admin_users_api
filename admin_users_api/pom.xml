@@ -51,7 +51,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
-            <version>6.2.2</version>
+            
         </dependency>
 
         <!-- SQLite JDBC -->
@@ -138,13 +138,22 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
-        
-        <!-- Rabbitmq -->
+        <dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+			<version>4.2.0</version>
+		</dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-amqp</artifactId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+            <version>3.4.5</version>
         </dependency>
 
+        <dependency>
+			<!-- Rabbitmq -->
+    		<groupId>org.springframework.boot</groupId>
+    		<artifactId>spring-boot-starter-amqp</artifactId>
+		</dependency>
     </dependencies>
 
     <build>
@@ -181,4 +190,21 @@
         </plugins>
     </build>
 
+
+
+    <dependencyManagement>
+    
+
+        <dependencies>
+        
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jdbc</artifactId>
+                <version>6.2.3</version>
+            </dependency>
+
+        </dependencies>
+
+    </dependencyManagement>
 </project>

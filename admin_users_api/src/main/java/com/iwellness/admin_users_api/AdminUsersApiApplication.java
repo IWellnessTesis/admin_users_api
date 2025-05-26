@@ -3,9 +3,11 @@ package com.iwellness.admin_users_api;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
+@EnableFeignClients
 @SpringBootApplication
 public class AdminUsersApiApplication implements ApplicationListener<ContextRefreshedEvent> {
 

@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -21,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SeguridadConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(SeguridadConfig.class);
@@ -37,9 +39,10 @@ public class SeguridadConfig {
             .csrf(AbstractHttpConfigurer::disable) // Deshabilitar CSRF
             .sessionManagement(customizer -> customizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Sin sesiones
             .authorizeHttpRequests(requests -> requests
-                .requestMatchers("/**").permitAll()
                 .requestMatchers("/auth/**").permitAll() // Permitir acceso público a los endpoints de autenticación
-                .requestMatchers("/debug/**").permitAll() // Permitir acceso a endpoints de debug
+                .requestMatchers("/usuarios/**").hasAnyAuthority("Admin", "Proveedor", "Turista")
+                .requestMatchers("/debug/**").hasAuthority("Admin")// Permitir acceso a endpoints de debug
+                .requestMatchers("/admin/**").hasAuthority("Admin") // Solo administradores pueden acceder a /admin/**
                 .anyRequest().authenticated() // Todas las demás rutas requieren autenticación
             )
             .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint)); // Manejar errores de autenticación

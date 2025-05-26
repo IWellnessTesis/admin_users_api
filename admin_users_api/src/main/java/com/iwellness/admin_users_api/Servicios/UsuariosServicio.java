@@ -11,6 +11,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.iwellness.admin_users_api.Clientes.PreferenciaFeignClient;
+import com.iwellness.admin_users_api.Clientes.ServicioFeignClient;
+import com.iwellness.admin_users_api.DTO.EditarProveedorDTO;
+import com.iwellness.admin_users_api.DTO.EditarTuristaDTO;
 import com.iwellness.admin_users_api.Entidades.Proveedor;
 import com.iwellness.admin_users_api.Entidades.Turista;
 import com.iwellness.admin_users_api.Entidades.Usuarios;
@@ -29,6 +33,12 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
     
     @Autowired
     private ProveedorRepositorio proveedorRepositorio;
+
+    @Autowired
+    private ServicioFeignClient servicioFeignClient;
+
+    @Autowired
+    private PreferenciaFeignClient preferenciaFeignClient;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -53,9 +63,69 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
         return password.matches("^[A-Za-z0-9+/=]+$") && password.length() >= 44;
     }
     
-    public Usuarios update(Usuarios usuario) {
-        return usuarioRepositorio.saveAndFlush(usuario);
+    public Usuarios actualizarUsuarioTurista(Long id, EditarTuristaDTO dto) {
+        Optional<Usuarios> opUsuario = usuarioRepositorio.findById(id);
+        if (!opUsuario.isPresent()) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+        Usuarios usuario = opUsuario.get();
+
+        // Actualiza el nombre del usuario
+        usuario.setNombre(dto.getNombre());
+        usuario.setFoto(dto.getFoto());
+
+        // Actualiza la información del turista
+        Turista turista = usuario.getTurista();
+        if (turista == null) {
+            throw new RuntimeException("Información del turista no encontrada");
+        }
+        turista.setTelefono(dto.getTelefono());
+        turista.setCiudad(dto.getCiudad());
+        turista.setPais(dto.getPais());
+        turista.setGenero(dto.getGenero());
+        turista.setFechaNacimiento(dto.getFechaNacimiento());
+        turista.setEstadoCivil(dto.getEstadoCivil());
+
+        // Se persisten las actualizaciones
+        // Debido al cascade en la relación uno a uno, se puede guardar primero el turista
+        turistaRepositorio.save(turista);
+        usuarioRepositorio.save(usuario);
+
+        return usuario;
     }
+
+    public Usuarios actualizarUsuarioProveedor(Long id, EditarProveedorDTO dto) {
+    Optional<Usuarios> opUsuario = usuarioRepositorio.findById(id);
+    if (!opUsuario.isPresent()) {
+        throw new RuntimeException("Usuario no encontrado");
+    }
+
+    Usuarios usuario = opUsuario.get();
+
+    // Actualiza el nombre del usuario
+    usuario.setNombre(dto.getNombre());
+
+    usuario.setFoto(dto.getFoto());
+
+    // Obtener y actualizar la información del proveedor
+    Proveedor proveedor = usuario.getProveedor();
+    if (proveedor == null) {
+        throw new RuntimeException("Información del proveedor no encontrada");
+    }
+
+    proveedor.setNombre_empresa(dto.getNombre_empresa());
+    proveedor.setCoordenadaX(dto.getCoordenadaX());
+    proveedor.setCoordenadaY(dto.getCoordenadaY());
+    proveedor.setCargoContacto(dto.getCargoContacto());
+    proveedor.setTelefono(dto.getTelefono());
+    proveedor.setTelefonoEmpresa(dto.getTelefonoEmpresa());
+
+    // Persistir cambios
+    proveedorRepositorio.save(proveedor);
+    usuarioRepositorio.save(usuario);
+
+    return usuario;
+}
     
     public List<Usuarios> findAll() {
         return usuarioRepositorio.findAll();
@@ -68,7 +138,19 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
 
     @Override
     public void deleteById(Long id) {
-        usuarioRepositorio.deleteById(id);
+        // Verificar si el proveedor existe
+        Usuarios usuario = usuarioRepositorio.findById(id).orElse(null);
+
+        if(usuario.getRol().getId() == 2){
+            // Llamar al micro de Servicios para eliminar los servicios del proveedor
+            servicioFeignClient.eliminarServiciosPorProveedor(id);
+            usuarioRepositorio.deleteById(id);
+        }else if(usuario.getRol().getId() == 1){
+            // Llamar al micro de Preferencias para eliminar las preferencias del turista
+            preferenciaFeignClient.eliminarPreferenciasPorTurista(id);
+            usuarioRepositorio.deleteById(id);
+        }
+
     }
 
     public boolean existsByNombre(String nombre) {
@@ -79,7 +161,7 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
         return usuarioRepositorio.existsByCorreo(correo);
     }
 
-    public Optional<Usuarios> findByCorre(String correo) {
+    public Optional<Usuarios> findByCorreo(String correo) {
         return usuarioRepositorio.findByCorreo(correo);
     }
 
@@ -115,7 +197,9 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
                         turistaMap.put("telefono", turista.getTelefono());
                         turistaMap.put("ciudad", turista.getCiudad());
                         turistaMap.put("pais", turista.getPais());
-                        turistaMap.put("actividadesInteres", turista.getActividadesInteres());
+                        turistaMap.put("genero", turista.getGenero());
+                        turistaMap.put("fechaNacimiento", turista.getFechaNacimiento());
+                        turistaMap.put("estadoCivil", turista.getEstadoCivil());
                         usuarioMap.put("turistaInfo", turistaMap);
                     } else {
                         usuarioMap.put("turistaInfo", null);
@@ -179,7 +263,9 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
                     turistaMap.put("telefono", turista.getTelefono());
                     turistaMap.put("ciudad", turista.getCiudad());
                     turistaMap.put("pais", turista.getPais());
-                    turistaMap.put("actividadesInteres", turista.getActividadesInteres());
+                    turistaMap.put("genero", turista.getGenero());
+                    turistaMap.put("fechaNacimiento", turista.getFechaNacimiento());
+                    turistaMap.put("estadoCivil", turista.getEstadoCivil());
                     usuarioMap.put("turistaInfo", turistaMap);
                 } else {
                     usuarioMap.put("turistaInfo", null);
@@ -209,6 +295,13 @@ public class UsuariosServicio implements CrudService<Usuarios, Long> {
         
         return usuarioMap;
     }
-    
-    
+
+    public List<Usuarios> obtenerProveedores() {
+        return usuarioRepositorio.getAllProveedores();
+    }
+
+    public List<Usuarios> obtenerTuristas() {
+        return usuarioRepositorio.getAllTuristas();
+    }
+
 }
